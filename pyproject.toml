@@ -1,0 +1,32 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "conformist"
+version = "v1.0.0-alpha.1"
+description = "Conformal prediction for machine learning classifiers"
+readme = "README.md"
+authors = [{ name = "Mariya Lysenkova Wiklander", email = "mariya.lysenkova@medsci.uu.se" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["machinelearning", "statistics"]
+dependencies = [
+    "numpy >= 1.24.4",
+    "pandas >= 2.0.3",
+    "UpSetPlot => 0.9.0"
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/Molmed/conformist"
+
