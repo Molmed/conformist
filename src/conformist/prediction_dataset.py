@@ -13,7 +13,12 @@ class PredictionDataset(OutputDir):
     PREDICTED_CLASS_COL = 'predicted_class'
     MELTED_KNOWN_CLASS_COL = 'melted_known_class'
 
-    def __init__(self, name, df=None, predictions_csv=None, display_classes=None):
+    def __init__(self,
+                 df=None,
+                 predictions_csv=None,
+                 dataset_col_name=None,
+                 dataset_name=None,
+                 display_classes=None):
         self.output_dir = None
 
         if df is None and predictions_csv is None:
@@ -26,18 +31,15 @@ class PredictionDataset(OutputDir):
 
         # Fill na's with 0s for prediction columns only
         self.df[self.class_names()] = self.df[self.class_names()].fillna(0)
-        self._create_dataset_column(name)
+        if dataset_col_name:
+            self._create_dataset_column_from_col(dataset_col_name)
+        elif dataset_name:
+            self._create_dataset_column_from_name(dataset_name)
         self._parse_predictions()
 
-        if display_classes:
-            self.display_classes = display_classes
+        self.display_classes = display_classes
 
-
-    def _create_dataset_column(self, name):
-        # Set dataset column to the name of this dataset
-        # and make it the first column
-        self.df[self.DATASET_NAME_COL] = name
-
+    def _create_dataset_column(self):
         # make dataset the first column
         self.df = self.df[[self.DATASET_NAME_COL] +
                           [col for col in self.df.columns
@@ -45,6 +47,14 @@ class PredictionDataset(OutputDir):
 
         # De-fragment
         self.df = self.df.copy()
+
+    def _create_dataset_column_from_col(self, col_name):
+        self.df[self.DATASET_NAME_COL] = self.df[col_name]
+        self._create_dataset_column()
+
+    def _create_dataset_column_from_name(self, name):
+        self.df[self.DATASET_NAME_COL] = name
+        self._create_dataset_column()
 
     def _parse_predictions(self):
         self.smx = self.df[self.class_names()].values
