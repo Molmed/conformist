@@ -132,6 +132,8 @@ class PredictionDataset(OutputDir):
         counts = counting_df.value_counts()
         if translate and self.display_classes:
             return counts.rename(index=self.display_classes)
+        # Remove index name
+        counts.index.name = None
         return counts
 
     def translate_class_name(self, class_name):
@@ -168,6 +170,10 @@ class PredictionDataset(OutputDir):
         # Translate if necessary
         if self.display_classes:
             ccs = ccs.rename(index=self.display_classes)
+
+        # Print count above each bar
+        for i, v in enumerate(ccs):
+            plt.text(i, v, str(v), ha='center', va='bottom')
 
         ccs.plot.bar()
 
@@ -261,10 +267,14 @@ class PredictionDataset(OutputDir):
 
         cols_to_keep = [self.DATASET_NAME_COL, self.ID_COL,
                         self.PREDICTED_CLASS_COL,
-                        'prediction_sets', 'prediction_set_softmax_scores']
+                        'prediction_sets']
 
         if has_known_class:
             cols_to_keep.append(self.KNOWN_CLASS_COL)
+
+        cols_to_keep.append('prediction_set_softmax_scores')
+
+        if has_known_class:
             cols_to_keep.append('known_class_softmax_scores')
 
         df = df[cols_to_keep]
