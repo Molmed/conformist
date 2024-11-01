@@ -133,8 +133,8 @@ class AlphaSelector(OutputDir):
     def visualize_lambdas(self):
         plt.figure()
 
-        # Only use alphas that are multiples of 0.1
-        alphas = [0.05] + [a for a in self.alphas if round(a, 1) == a]
+        # Only use reasonable alphas
+        alphas = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4]
 
         SYM_LAMHAT = r'$\hatλ$'
         n_colors = len(alphas)
