@@ -2,28 +2,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=League+Script&display=swap" rel="stylesheet">
+<link href="readme.css" rel="stylesheet">
 
-
-<!-- Apply the font style -->
-<style>
-  .custom-font {
-    font-family: "League Script", cursive;
-    font-weight: 400;
-    font-style: normal;
-  }
-
-  .miami-neon-text {
-    background: linear-gradient(90deg,
-                                #00f5ff, #ff00f5, #ff0080, #00ffab, #00f5ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: bold;
-    font-size: 6em;
-    }
-</style>
 
 [![Python package](https://github.com/Molmed/conformist/actions/workflows/python-package.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-package.yml)
 [![Upload Python Package](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml)
+
 
 <h1 class="custom-font miami-neon-text">Conformist</h1>
 

@@ -1,0 +1,14 @@
+.custom-font {
+    font-family: "League Script", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .miami-neon-text {
+    background: linear-gradient(90deg,
+                                #00f5ff, #ff00f5, #ff0080, #00ffab, #00f5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    font-size: 6em;
+    }
