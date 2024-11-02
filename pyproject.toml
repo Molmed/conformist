@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "conformist"
-version = "v1.0.0-alpha.1"
+version = "v1.0.0"
 description = "Conformal prediction for machine learning classifiers"
 readme = "README.md"
 authors = [{ name = "Mariya Lysenkova Wiklander", email = "mariya.lysenkova@medsci.uu.se" }]
@@ -31,4 +31,35 @@ dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
 
 [project.urls]
 Homepage = "https://github.com/Molmed/conformist"
+
+[tool.bumpver]
+current_version = "v1.0.0"
+version_pattern = "vMAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+pre_commit_hook = ""
+post_commit_hook = ""
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"',
+]
+"README.md" = [
+    "{version}",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
+
+[tool.setuptools]
+packages = ["conformist"]
+package-dir = {"" = "src"}
+
 

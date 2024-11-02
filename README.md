@@ -1,4 +1,4 @@
-# Conformist v1.0.0-alpha.1
+# Conformist v1.0.0
 
 Conformist is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
 
