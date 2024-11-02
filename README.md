@@ -1,15 +1,42 @@
+<!-- Link to Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Script&display=swap" rel="stylesheet">
+
+
+<!-- Apply the font style -->
+<style>
+  .custom-font {
+    font-family: "League Script", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .miami-neon-text {
+    background: linear-gradient(90deg,
+                                #00f5ff, #ff00f5, #ff0080, #00ffab, #00f5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    font-size: 6em;
+    }
+</style>
+
 [![Python package](https://github.com/Molmed/conformist/actions/workflows/python-package.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-package.yml)
 [![Upload Python Package](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml)
 
-# Conformist v1.0.2
+<h1 class="custom-font miami-neon-text">Conformist</h1>
 
-Conformist is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
+Conformist v1.0.2 is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
 
 *BaseCoP* contains utility functions common to all conformal predictors, such as splitting data into calibration and validation sets, and setting up runs. It is extended by *FNRCoP* that implements conformal risk control.
 
 The *ValidationRun* class contains the data from a single run, which entails shuffling the data randomly, splitting it into calibration and validation datasets, calibrating the conformal predictor on the calibration data and creating prediction sets for the validation data.
 
 The *ValidationTrial* class contains a list of runs and calculates statistics across these runs.
+
+## Installation
+`pip install conformist`
 
 ## Input file format
 
