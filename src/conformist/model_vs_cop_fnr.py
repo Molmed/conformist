@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from conformist import OutputDir, PredictionDataset
+from . import OutputDir, PredictionDataset
 
 
 class ModelVsCopFNR(OutputDir):

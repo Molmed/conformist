@@ -1,5 +1,5 @@
 import pandas as pd
-from conformist import OutputDir, PredictionDataset
+from . import OutputDir, PredictionDataset
 
 
 class PredictionDataPreprocessor(OutputDir):
