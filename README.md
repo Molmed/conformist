@@ -1,4 +1,5 @@
 [![Python package](https://github.com/Molmed/conformist/actions/workflows/python-package.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-package.yml)
+[![Upload Python Package](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml)
 
 # Conformist v1.0.2
 
