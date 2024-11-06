@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from .output_dir import OutputDir
+from .performance_report import PerformanceReport
 
 
 class ValidationRun(OutputDir):
@@ -124,6 +125,10 @@ class ValidationRun(OutputDir):
         return averages
 
     def run_reports(self, base_output_dir):
+        pr = PerformanceReport(base_output_dir)
+        pr.report_class_statistics(self.mean_set_sizes_by_class(self.class_names),
+                                   self.mean_fnrs_by_class(self.class_names))
+
         np.seterr(all='raise')
         self.create_output_dir(base_output_dir)
 
@@ -138,11 +143,5 @@ class ValidationRun(OutputDir):
         }, index=[0])
 
         df.T.to_csv(f'{self.output_dir}/summary.csv', header=False)
-
-        df = pd.DataFrame(self.mean_set_sizes_by_class(self.class_names), index=[0])
-        df.T.to_csv(f'{self.output_dir}/mean_set_sizes_by_class.csv', header=False)
-
-        df = pd.DataFrame(self.mean_fnrs_by_class(self.class_names), index=[0])
-        df.T.to_csv(f'{self.output_dir}/mean_fnrs_by_class.csv', header=False)
 
         print(f'Reports saved to {self.output_dir}')

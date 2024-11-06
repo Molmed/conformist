@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from .output_dir import OutputDir
+from .performance_report import PerformanceReport
 
 
 class ValidationTrial(OutputDir):
@@ -102,10 +103,10 @@ class ValidationTrial(OutputDir):
                 means[class_name] = statistics.mean(d_means)
         return means
 
-    def run_reports(self, base_output_dir, display_classes=None):
+    def run_reports(self, base_output_dir):
         self.create_output_dir(base_output_dir)
         self.visualize_empirical_fnr()
-        self.visualize_class_performance(display_classes)
+        self.visualize_class_performance()
         print(f'Reports saved to {self.output_dir}')
 
     def visualize_empirical_fnr(self):
@@ -140,68 +141,8 @@ class ValidationTrial(OutputDir):
         # Save the figure
         plt.savefig(f'{self.output_dir}/empirical_fnr.png')
 
-    def visualize_class_performance(self, display_classes=None):
-        def translate_class_name(class_name):
-            if display_classes is None or class_name not in display_classes:
-                return class_name
-            else:
-                return display_classes[class_name]
-
-        def translate_dict(d):
-            return {translate_class_name(key): value for key, value in d.items()}
-
-        plt.figure()
-
-        # FNRs by class
+    def visualize_class_performance(self):
         fnrs_by_class = self.mean_fnrs_by_class(self.class_names)
-
-        # Sort the dictionary by its values
-        mean_fnrs = translate_dict(dict(sorted(fnrs_by_class.items(), key=lambda item: item[1])))
-
-        # Visualize this dict as a bar chart
-        sns.set_style('whitegrid')
-        palette = sns.color_palette("deep")  # You can change "deep" to any other palette
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.bar(range(len(mean_fnrs)), mean_fnrs.values(), color=palette[0])
-        ax.set_xticks(range(len(mean_fnrs)))
-        ax.set_xticklabels(mean_fnrs.keys(), rotation='vertical')
-        ax.set_ylabel('Mean FNR')
-        ax.set_xlabel('True class')
-        plt.tight_layout()
-
-        # Export as fig and text
-        plt.savefig(f'{self.output_dir}/mean_fnrs_by_class.png')
-
-        # Convert dictionary to dataframe
-        df = pd.DataFrame(mean_fnrs, index=[0]).T
-
-        # Transpose the dataframe
-        df.to_csv(f'{self.output_dir}/mean_fnrs_by_class.csv',
-                  index=True, header=False)
-
-        # Reset plt
-        plt.figure()
-
-        # Set sizes by class
         mean_set_sizes = self.mean_set_sizes_by_class(self.class_names)
-
-        # Sort the dictionary by its values
-        mean_set_sizes = translate_dict(dict(sorted(mean_set_sizes.items(), key=lambda item: item[1])))
-
-        # Convert dictionary to dataframe
-        df = pd.DataFrame(mean_set_sizes, index=[0]).T
-
-        # Transpose the dataframe
-        df.to_csv(f'{self.output_dir}/mean_set_sizes_class.csv',
-                  index=True, header=False)
-
-        # Visualize this dict as a bar chart
-        sns.set_style('whitegrid')
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.bar(range(len(mean_set_sizes)), mean_set_sizes.values(), color=palette[1])
-        ax.set_xticks(range(len(mean_set_sizes)))
-        ax.set_xticklabels(mean_set_sizes.keys(), rotation='vertical')
-        ax.set_ylabel('Mean set size')
-        ax.set_xlabel('True class')
-        plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/mean_set_sizes_by_class.png')
+        pr = PerformanceReport(self.output_dir)
+        pr.report_class_statistics(mean_set_sizes, fnrs_by_class)
