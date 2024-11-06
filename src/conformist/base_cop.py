@@ -129,17 +129,16 @@ class BaseCoP(OutputDir):
 
         prediction_sets = self.get_prediction_sets()
         prediction_sets_text = self.prediction_sets_to_text(prediction_sets)
-        formatted_predictions = pds.prediction_sets_df(prediction_sets_text,
-                                                       output_dir)
+        formatted_predictions = pds.prediction_sets_df(prediction_sets_text)
 
         # -- WRITE PREDICTIONS TO CSV
-        formatted_predictions.to_csv(f'{output_dir}/predictions.csv')
+        formatted_predictions.to_csv(f'{self.output_dir}/prediction_sets.csv')
 
         # -- GENERATE REPORTS --
         # Upset plot
         self.upset_plot(
             prediction_sets,
-            output_dir,
+            self.output_dir,
             upset_plot_color)
 
         if validate:
@@ -151,12 +150,12 @@ class BaseCoP(OutputDir):
                     self.val_model_predictions,
                     self.softmax_threshold,
                     self.class_names)
-            vr.run_reports(output_dir)
+            vr.run_reports(self.output_dir)
         else:
             # Generate just basic statistics
             mean_set_size = PerformanceReport.mean_set_size(
                     prediction_sets)
-            pr = PerformanceReport(output_dir)
+            pr = PerformanceReport(self.output_dir)
             pr.visualize_mean_set_sizes_by_class(mean_set_size)
 
             stats = {

@@ -279,12 +279,5 @@ class PredictionDataset(OutputDir):
 
         df = df[cols_to_keep]
 
-        # Export the DataFrame to a CSV file
-        if export_to_dir:
-            if not self.output_dir:
-                self.create_output_dir(export_to_dir)
-            df.to_csv(f'{self.output_dir}/prediction_sets.csv', index=False)
-            print(f'Prediction sets saved to {self.output_dir}/prediction_sets.csv') # noqa
-
         return df
 
