@@ -6,7 +6,7 @@ from .output_dir import OutputDir
 
 class PerformanceReport(OutputDir):
     def __init__(self, base_output_dir):
-        self.create_output_dir(self.base_output_dir)
+        self.create_output_dir(base_output_dir)
 
     def mean_set_size(prediction_sets):
         return sum(sum(prediction_set) for
@@ -51,6 +51,7 @@ class PerformanceReport(OutputDir):
 
         # Visualize this dict as a bar chart
         sns.set_style('whitegrid')
+        palette = sns.color_palette("deep")
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.bar(range(len(mean_set_sizes)), mean_set_sizes.values(), color=palette[1])
         ax.set_xticks(range(len(mean_set_sizes)))

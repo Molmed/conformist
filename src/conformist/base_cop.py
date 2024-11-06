@@ -8,6 +8,7 @@ from .validation_run import ValidationRun
 from .validation_trial import ValidationTrial
 from .prediction_dataset import PredictionDataset
 from .output_dir import OutputDir
+from .performance_report import PerformanceReport
 
 
 DEFAULT_VALIDATION_PROPORTION = 0.25
@@ -112,10 +113,12 @@ class BaseCoP(OutputDir):
 
     def predict(self,
                 pds,
-                export_to_dir=None,
+                output_dir,
                 validate=False,
-                display_classes=None,
                 upset_plot_color="black"):
+
+        self.create_output_dir(output_dir)
+
         self.smx = pds.smx
         self.val_smx = pds.smx
         self.val_labels = pds.labels_idx
@@ -127,32 +130,51 @@ class BaseCoP(OutputDir):
         prediction_sets = self.get_prediction_sets()
         prediction_sets_text = self.prediction_sets_to_text(prediction_sets)
         formatted_predictions = pds.prediction_sets_df(prediction_sets_text,
-                                                       export_to_dir)
+                                                       output_dir)
 
-        if export_to_dir:
-            self.upset_plot(
-                prediction_sets,
-                export_to_dir,
-                display_classes,
-                upset_plot_color)
+        # -- WRITE PREDICTIONS TO CSV
+        formatted_predictions.to_csv(f'{output_dir}/predictions.csv')
 
-        if not validate:
-            return formatted_predictions
+        # -- GENERATE REPORTS --
+        # Upset plot
+        self.upset_plot(
+            prediction_sets,
+            output_dir,
+            upset_plot_color)
 
-        vr = ValidationRun(
-                self.val_idx,
-                self.val_sample_names,
-                prediction_sets,
-                self.val_labels,
-                self.val_model_predictions,
-                self.softmax_threshold,
-                self.class_names)
+        if validate:
+            vr = ValidationRun(
+                    self.val_idx,
+                    self.val_sample_names,
+                    prediction_sets,
+                    self.val_labels,
+                    self.val_model_predictions,
+                    self.softmax_threshold,
+                    self.class_names)
+            vr.run_reports(output_dir)
+        else:
+            # Generate just basic statistics
+            mean_set_size = PerformanceReport.mean_set_size(
+                    prediction_sets)
+            pr = PerformanceReport(output_dir)
+            pr.visualize_mean_set_sizes_by_class(mean_set_size)
 
-        if export_to_dir:
-            vr.run_reports(export_to_dir)
+            stats = {
+                'mean_set_size': mean_set_size,
+                'pct_empty_sets': PerformanceReport.pct_empty_sets(
+                    prediction_sets),
+                'pct_singleton_sets': PerformanceReport.pct_singleton_sets(
+                    prediction_sets),
+                'pct_singleton_or_duo_sets':
+                    PerformanceReport.pct_singleton_or_duo_sets(
+                        prediction_sets),
+                'pct_trio_plus_sets': PerformanceReport.pct_trio_plus_sets(
+                    prediction_sets)
+            }
+            df = pd.DataFrame(stats, index=[0])
+            df.T.to_csv(f'{self.output_dir}/summary.csv', header=False)
 
-        return formatted_predictions, vr
-
+        return formatted_predictions
 
     def prediction_set_to_text(self, prediction_set, display_classes=None):
         class_names = self.class_names
@@ -170,13 +192,10 @@ class BaseCoP(OutputDir):
         return [self.prediction_set_to_text(prediction_set, display_classes)
                 for prediction_set in prediction_sets]
 
-    def upset_plot(self, predictions_sets, export_to_dir, display_classes=None, color="black"):
+    def upset_plot(self, predictions_sets, output_dir, color="black"):
         plt.figure()
 
         class_names = self.class_names
-        # Replace any class_names in display_classes with the display name
-        if display_classes:
-            class_names = [display_classes.get(cn, cn) for cn in class_names]
 
         # Make prediction_sets into a df with class_names as columns
         upset_data = pd.DataFrame(predictions_sets, columns=class_names)
@@ -191,6 +210,6 @@ class BaseCoP(OutputDir):
 
         plot(upset_data, sort_by="cardinality", facecolor=color, show_counts="%d", show_percentages="{:.0%}")
 
-        path = f'{export_to_dir}/upset_plot.png'
+        path = f'{output_dir}/upset_plot.png'
         print("Saving upset plot to", path)
         plt.savefig(path)
