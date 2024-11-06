@@ -113,11 +113,9 @@ class BaseCoP(OutputDir):
 
     def predict(self,
                 pds,
-                output_dir,
+                output_dir=None,
                 validate=False,
                 upset_plot_color="black"):
-
-        self.create_output_dir(output_dir)
 
         self.smx = pds.smx
         self.val_smx = pds.smx
@@ -130,6 +128,11 @@ class BaseCoP(OutputDir):
         prediction_sets = self.get_prediction_sets()
         prediction_sets_text = self.prediction_sets_to_text(prediction_sets)
         formatted_predictions = pds.prediction_sets_df(prediction_sets_text)
+
+        if not output_dir:
+            return formatted_predictions
+
+        self.create_output_dir(output_dir)
 
         # -- WRITE PREDICTIONS TO CSV
         formatted_predictions.to_csv(f'{self.output_dir}/prediction_sets.csv')
