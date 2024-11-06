@@ -8,6 +8,31 @@ class PerformanceReport(OutputDir):
     def __init__(self, base_output_dir):
         self.base_output_dir = base_output_dir
 
+    def mean_set_size(prediction_sets):
+        return sum(sum(prediction_set) for
+                   prediction_set in prediction_sets) / \
+                   len(prediction_sets)
+
+    def pct_empty_sets(prediction_sets):
+        return sum(sum(prediction_set) == 0 for
+                   prediction_set in prediction_sets) / \
+                    len(prediction_sets)
+
+    def pct_singleton_sets(prediction_sets):
+        return sum(sum(prediction_set) == 1 for
+                   prediction_set in prediction_sets) / \
+                    len(prediction_sets)
+
+    def pct_singleton_or_duo_sets(prediction_sets):
+        return sum(sum(prediction_set) == 1 or sum(prediction_set) == 2 for
+                   prediction_set in prediction_sets) / \
+                    len(prediction_sets)
+
+    def pct_trio_plus_sets(prediction_sets):
+        return sum(sum(prediction_set) >= 3 for
+                   prediction_set in prediction_sets) / \
+                    len(prediction_sets)
+
     def report_class_statistics(self,
                                 mean_set_sizes_by_class,
                                 mean_fnrs_by_class):

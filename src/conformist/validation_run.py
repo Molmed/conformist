@@ -42,29 +42,19 @@ class ValidationRun(OutputDir):
         self.softmax_thresholds = softmax_thresholds
 
     def mean_set_size(self):
-        return sum(sum(prediction_set) for
-                   prediction_set in self.prediction_sets) / \
-                    len(self.prediction_sets)
+        return PerformanceReport.mean_set_size(self.prediction_sets)
 
     def pct_empty_sets(self):
-        return sum(sum(prediction_set) == 0 for
-                   prediction_set in self.prediction_sets) / \
-                    len(self.prediction_sets)
+        return PerformanceReport.pct_empty_sets(self.prediction_sets)
 
     def pct_singleton_sets(self):
-        return sum(sum(prediction_set) == 1 for
-                   prediction_set in self.prediction_sets) / \
-                    len(self.prediction_sets)
+        return PerformanceReport.pct_singleton_sets(self.prediction_sets)
 
     def pct_singleton_or_duo_sets(self):
-        return sum(sum(prediction_set) == 1 or sum(prediction_set) == 2 for
-                   prediction_set in self.prediction_sets) / \
-                    len(self.prediction_sets)
+        return PerformanceReport.pct_singleton_or_duo_sets(self.prediction_sets)
 
     def pct_trio_plus_sets(self):
-        return sum(sum(prediction_set) >= 3 for
-                   prediction_set in self.prediction_sets) / \
-                    len(self.prediction_sets)
+        return PerformanceReport.pct_trio_plus_sets(self.prediction_sets)
 
     def false_negative_rate(self):
         return 1 - ((self.prediction_sets * self.labels_idx).sum(axis=1) /
