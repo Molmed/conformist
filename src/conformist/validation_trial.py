@@ -91,7 +91,8 @@ class ValidationTrial(OutputDir):
     def mean_fnrs_by_class(self, class_names):
         fnr_dicts = []
         for run in self.runs:
-            fnr_dicts.append(run.mean_fnrs_by_class(class_names))
+            fnr_dicts.append(run.mean_fnrs_by_class(run.prediction_sets,
+                                                    class_names))
 
         means = {}
         for class_name in class_names:
