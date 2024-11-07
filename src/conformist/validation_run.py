@@ -93,13 +93,13 @@ class ValidationRun(OutputDir):
             averages[key] = sum(sizes) / len(sizes)
         return averages
 
-    def mean_fnrs_by_class(self, class_names):
+    def mean_fnrs_by_class(self, sets, class_names):
         fnrs = {}
-        for i in range(len(self.prediction_sets)):
+        for i in range(len(sets)):
             labels = self.labels_idx[i]
             # Get corresponding values from class_names
             pset_class_names = [class_names[i] for i, label in enumerate(labels) if label == 1]
-            pset = np.array([int(value) for value in self.prediction_sets[i]])
+            pset = np.array([int(value) for value in sets[i]])
             if (pset[labels == 1] == 1).size > 0:
                 fnr = 1 - np.mean((pset[labels == 1] == 1))
             else:
@@ -117,7 +117,8 @@ class ValidationRun(OutputDir):
     def run_reports(self, base_output_dir):
         pr = PerformanceReport(base_output_dir)
         pr.report_class_statistics(self.mean_set_sizes_by_class(self.class_names),
-                                   self.mean_fnrs_by_class(self.class_names))
+                                   self.mean_fnrs_by_class(self.prediction_sets, self.class_names),
+                                   self.mean_fnrs_by_class(self.model_predictions, self.class_names))
 
         np.seterr(all='raise')
         self.create_output_dir(base_output_dir)
