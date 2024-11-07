@@ -156,14 +156,7 @@ class BaseCoP(OutputDir):
                     self.class_names)
             vr.run_reports(self.output_dir)
         else:
-            # Generate just basic statistics
-            mean_set_size = PerformanceReport.mean_set_size(
-                    prediction_sets)
-            pr = PerformanceReport(self.output_dir)
-            pr.visualize_mean_set_sizes_by_class(mean_set_size)
-
             stats = {
-                'mean_set_size': mean_set_size,
                 'pct_empty_sets': PerformanceReport.pct_empty_sets(
                     prediction_sets),
                 'pct_singleton_sets': PerformanceReport.pct_singleton_sets(
