@@ -135,7 +135,8 @@ class BaseCoP(OutputDir):
         self.create_output_dir(output_dir)
 
         # -- WRITE PREDICTIONS TO CSV
-        formatted_predictions.to_csv(f'{self.output_dir}/prediction_sets.csv')
+        formatted_predictions.to_csv(f'{self.output_dir}/prediction_sets.csv',
+                                     index=False)
 
         # -- GENERATE REPORTS --
         # Upset plot
