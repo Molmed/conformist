@@ -136,6 +136,11 @@ class PredictionDataset(OutputDir):
         counts.index.name = None
         return counts
 
+    def class_counts_by_dataset(self):
+        counting_df = self.melt()
+        counts = counting_df.groupby([self.DATASET_NAME_COL, self.MELTED_KNOWN_CLASS_COL]).size()
+        return counts
+
     def translate_class_name(self, class_name):
         if self.display_classes and class_name in self.display_classes:
             return self.display_classes[class_name]
@@ -158,6 +163,7 @@ class PredictionDataset(OutputDir):
     def run_reports(self, base_output_dir):
         self.create_output_dir(base_output_dir)
         self.visualize_class_counts()
+        self.visualize_class_counts_by_dataset()
         self.visualize_prediction_heatmap()
         print(f'Reports saved to {self.output_dir}')
 
@@ -182,6 +188,33 @@ class PredictionDataset(OutputDir):
 
         # show the plot
         plt.savefig(f'{self.output_dir}/class_counts.png', bbox_inches='tight')
+
+    def visualize_class_counts_by_dataset(self):
+        plt.figure()
+
+        # create a bar chart
+        ccs = self.class_counts_by_dataset()
+
+        # Count how many datasets and create a grid of plots
+        num_datasets = len(ccs.index.get_level_values(0).unique())
+        fig, axs = plt.subplots(num_datasets, 1, figsize=(10, 8 * num_datasets))
+
+        # For each dataset, create a bar chart
+        for i, dataset in enumerate(ccs.index.get_level_values(0).unique()):
+            sorted = ccs.loc[dataset].sort_values(ascending=False)
+
+            # Set fixed width for bar
+            # axs[i].bar(sorted.index, sorted.values, width=0.5)
+            sorted.plot.bar(ax=axs[i])
+            axs[i].set_title(dataset)
+
+            # Print count above each bar
+            for j, v in enumerate(sorted):
+                axs[i].text(j, v, str(v), ha='center', va='bottom')
+
+        # show the plot
+        plt.savefig(f'{self.output_dir}/class_counts_by_dataset.png',
+                    bbox_inches='tight')
 
     def visualize_prediction_heatmap(self):
         plt.figure(figsize=(10, 8))
