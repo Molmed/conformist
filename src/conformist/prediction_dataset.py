@@ -199,6 +199,9 @@ class PredictionDataset(OutputDir):
         num_datasets = len(ccs.index.get_level_values(0).unique())
         fig, axs = plt.subplots(num_datasets, 1, figsize=(10, 8 * num_datasets))
 
+        if num_datasets == 1:
+            axs = [axs]
+
         # For each dataset, create a bar chart
         for i, dataset in enumerate(ccs.index.get_level_values(0).unique()):
             sorted = ccs.loc[dataset].sort_values(ascending=False)
