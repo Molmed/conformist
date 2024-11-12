@@ -192,6 +192,9 @@ class PredictionDataset(OutputDir):
     def visualize_class_counts_by_dataset(self):
         plt.figure()
 
+        # Set the font size for the entire figure
+        plt.rcParams.update({'font.size': 12})  # Adjust the font size as needed
+
         # create a bar chart
         ccs = self.class_counts_by_dataset()
 
@@ -242,13 +245,17 @@ class PredictionDataset(OutputDir):
                 if np.isfinite(v):
                     axs[i].text(j, v, str(v), ha='center', va='bottom')
 
-            # Remove x-axis labels
-            axs[i].set_xticklabels([])
-            axs[i].set_xticks([])
+            # Set x-axis labels to class names and rotate them vertically
+            axs[i].set_xticks(range(len(sorted_series.index)))
+            axs[i].set_xticklabels(sorted_series.index, rotation=90)
 
             # Add legend
-            if i == 0:
-                axs[i].legend(bars, sorted_series.index, title="Classes")
+            # if i == 0:
+            #     axs[i].legend(bars, sorted_series.index, title="Classes")
+
+        # Adjust layout to prevent overlap and add margin under each panel
+        plt.tight_layout()
+        plt.subplots_adjust(hspace=0.5)  # Adjust hspace to add margin
 
         # show the plot
         plt.savefig(f'{self.output_dir}/class_counts_by_dataset.png',
