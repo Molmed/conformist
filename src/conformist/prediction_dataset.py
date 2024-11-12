@@ -211,10 +211,10 @@ class PredictionDataset(OutputDir):
         if num_datasets == 1:
             axs = [axs]
 
-        # Group by the first level of the index (dataset) and sum the values
-        grouped_ccs = ccs.groupby(level=0).sum()
+        # Group by the first level of the index (dataset) and count the number of unique classes
+        grouped_ccs = ccs.groupby(level=0).apply(lambda x: x.index.get_level_values(1).nunique())
 
-        # Order datasets by number of items
+        # Order datasets by number of unique classes
         ordered_datasets = grouped_ccs.sort_values(ascending=False).index
 
         # For each dataset, create a bar chart
@@ -244,6 +244,7 @@ class PredictionDataset(OutputDir):
 
             # Remove x-axis labels
             axs[i].set_xticklabels([])
+            axs[i].set_xticks([])
 
             # Add legend
             if i == 0:
