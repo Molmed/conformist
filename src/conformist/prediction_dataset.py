@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
+from matplotlib.patches import Patch
 
 from .output_dir import OutputDir
 
@@ -165,6 +166,7 @@ class PredictionDataset(OutputDir):
         self.visualize_class_counts()
         self.visualize_class_counts_by_dataset()
         self.visualize_prediction_heatmap()
+        self.visualize_prediction_stripplot()
         print(f'Reports saved to {self.output_dir}')
 
     def _class_colors(self):
@@ -349,11 +351,18 @@ class PredictionDataset(OutputDir):
                       x='Softmax score',
                       y='True class',
                         hue='Predicted class',
-                        jitter=0.2,
-                        alpha=0.5,
+                        jitter=0.5,
+                        alpha=0.75,
                         dodge=True,
                         palette=self._class_colors(),
-                        size=5)
+                        size=4)
+
+        # Create custom legend handles
+        class_to_color = self._class_colors()
+        legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in new_df['Predicted class'].unique()]
+
+        # Position the legend to the right of the plot with bars instead of dots
+        plt.legend(handles=legend_handles, title="Predicted Classes", bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
 
         # Save the plot to a file
         plt.tight_layout()
