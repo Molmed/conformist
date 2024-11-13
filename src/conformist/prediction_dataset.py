@@ -166,7 +166,10 @@ class PredictionDataset(OutputDir):
         self.visualize_class_counts()
         self.visualize_class_counts_by_dataset()
         self.visualize_prediction_heatmap()
-        self.visualize_prediction_stripplot()
+        self.visualize_prediction_stripplot('prediction_stripplot_all')
+        self.visualize_prediction_stripplot('prediction_stripplot_0.5',
+                                            min_softmax_threshold=0.5)
+
         print(f'Reports saved to {self.output_dir}')
 
     def _class_colors(self):
@@ -316,7 +319,9 @@ class PredictionDataset(OutputDir):
         # Save the plot to a file
         plt.savefig(f'{self.output_dir}/prediction_heatmap.png', bbox_inches='tight')
 
-    def visualize_prediction_stripplot(self):
+    def visualize_prediction_stripplot(self,
+                                       output_filename_prefix,
+                                       min_softmax_threshold=None):
         plt.figure()
 
         # Set the font size for the entire figure
@@ -339,7 +344,9 @@ class PredictionDataset(OutputDir):
                     'Predicted class': col,
                     'Softmax score': row[col]
                 }
-                rows.append(new_row)
+
+                if min_softmax_threshold is None or row[col] >= min_softmax_threshold:
+                    rows.append(new_row)
 
         new_df = pd.concat([new_df, pd.DataFrame(rows)], ignore_index=True)
 
@@ -367,9 +374,7 @@ class PredictionDataset(OutputDir):
         # Save the plot to a file
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.5)
-        plt.savefig(f'{self.output_dir}/prediction_stripplot.png', bbox_inches='tight')
-
-
+        plt.savefig(f'{self.output_dir}/{output_filename_prefix}.png', bbox_inches='tight')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
         # Make a copy of the DataFrame
