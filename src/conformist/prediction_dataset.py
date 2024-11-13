@@ -167,6 +167,16 @@ class PredictionDataset(OutputDir):
         self.visualize_prediction_heatmap()
         print(f'Reports saved to {self.output_dir}')
 
+    def _class_colors(self):
+        # Define a colormap
+        colormap = plt.cm.get_cmap('tab20')
+
+        # Create a dictionary to map each class to a color
+        class_to_color = {
+            cls: colormap(i) for i, cls in enumerate(self.class_names())}
+
+        return class_to_color
+
     def visualize_class_counts(self):
         plt.figure()
 
@@ -198,14 +208,8 @@ class PredictionDataset(OutputDir):
         # create a bar chart
         ccs = self.class_counts_by_dataset()
 
-        # Get all unique classes
-        all_classes = ccs.index.get_level_values(1).unique()
-
-        # Define a colormap
-        colormap = plt.cm.get_cmap('tab20')
-
         # Create a dictionary to map each class to a color
-        class_to_color = {cls: colormap(i) for i, cls in enumerate(all_classes)}
+        class_to_color = self._class_colors()
 
         # Count how many datasets and create a grid of plots
         num_datasets = len(ccs.index.get_level_values(0).unique())
