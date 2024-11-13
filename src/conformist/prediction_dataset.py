@@ -172,8 +172,9 @@ class PredictionDataset(OutputDir):
         colormap = plt.cm.get_cmap('tab20')
 
         # Create a dictionary to map each class to a color
+        classes = self.class_names()
         class_to_color = {
-            cls: colormap(i) for i, cls in enumerate(self.class_names())}
+            cls: colormap(i) for i, cls in enumerate(classes)}
 
         return class_to_color
 
@@ -312,6 +313,54 @@ class PredictionDataset(OutputDir):
 
         # Save the plot to a file
         plt.savefig(f'{self.output_dir}/prediction_heatmap.png', bbox_inches='tight')
+
+    def visualize_prediction_stripplot(self):
+        plt.figure()
+
+        # Set the font size for the entire figure
+        plt.rcParams.update({'font.size': 12})
+
+        df = self.melt()
+        cols = [col for col in df.columns if col in self.class_names()]
+
+        # Create a new df new_df
+        # Loop through rows in df. For each row, create a new row in new_df for each class in cols
+        # For each row in new_df, add the softmax score for the corresponding class
+
+        new_df = pd.DataFrame(columns=['True class', 'Predicted class', 'Softmax score'])
+
+        rows = []
+        for index, row in df.iterrows():
+            for col in cols:
+                new_row = {
+                    'True class': row[self.MELTED_KNOWN_CLASS_COL],
+                    'Predicted class': col,
+                    'Softmax score': row[col]
+                }
+                rows.append(new_row)
+
+        new_df = pd.concat([new_df, pd.DataFrame(rows)], ignore_index=True)
+
+        # Increase the height of each row by adjusting the figure size
+        num_classes = new_df['True class'].nunique()
+        plt.figure(figsize=(10, num_classes * 1))  # Adjust the height multiplier as needed
+
+        sns.stripplot(data=new_df,
+                      x='Softmax score',
+                      y='True class',
+                        hue='Predicted class',
+                        jitter=0.2,
+                        alpha=0.5,
+                        dodge=True,
+                        palette=self._class_colors(),
+                        size=5)
+
+        # Save the plot to a file
+        plt.tight_layout()
+        plt.subplots_adjust(hspace=0.5)
+        plt.savefig(f'{self.output_dir}/prediction_stripplot.png', bbox_inches='tight')
+
+
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
         # Make a copy of the DataFrame
