@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
 from matplotlib.patches import Patch
+from upsetplot import plot
 
 from .output_dir import OutputDir
 
@@ -169,7 +170,7 @@ class PredictionDataset(OutputDir):
         self.visualize_prediction_stripplot('prediction_stripplot_all')
         self.visualize_prediction_stripplot('prediction_stripplot_0.5',
                                             min_softmax_threshold=0.5)
-
+        self.visualize_model_sets(0.5, '#457b9d')
         print(f'Reports saved to {self.output_dir}')
 
     def _class_colors(self):
@@ -375,6 +376,38 @@ class PredictionDataset(OutputDir):
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.5)
         plt.savefig(f'{self.output_dir}/{output_filename_prefix}.png', bbox_inches='tight')
+
+    def visualize_model_sets(self, min_softmax_threshold=0.5, color="black"):
+        plt.figure()
+
+        # Set the font size for the entire figure
+        plt.rcParams.update({'font.size': 10})
+
+        df = self.melt()
+        cols = [col for col in df.columns if col in self.class_names()]
+
+        new_df = pd.DataFrame(columns=cols)
+
+        rows = []
+        for index, row in df.iterrows():
+            new_row = {}
+            for col in cols:
+                new_row[col] = (row[col] >= min_softmax_threshold)
+            rows.append(new_row)
+
+        upset_data = pd.concat([new_df, pd.DataFrame(rows)], ignore_index=True)
+        # Set a multi-index
+        upset_data.set_index(upset_data.columns.tolist(), inplace=True)
+
+        # upset = UpSet(upset_data)
+        # upset.add_catplot("violin")
+        plot(upset_data,
+             sort_by="cardinality",
+             facecolor=color,
+             show_counts="%d",
+             show_percentages="{:.0%}",
+             orientation='horizontal')
+        plt.savefig(f'{self.output_dir}/upset.png', bbox_inches='tight')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
         # Make a copy of the DataFrame
