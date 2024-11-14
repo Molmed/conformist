@@ -7,6 +7,8 @@ from upsetplot import plot
 
 from .output_dir import OutputDir
 
+plt.rcParams.update({'font.size': 10})
+
 
 class PredictionDataset(OutputDir):
     DATASET_NAME_COL = 'dataset'
@@ -209,9 +211,6 @@ class PredictionDataset(OutputDir):
     def visualize_class_counts_by_dataset(self):
         plt.figure()
 
-        # Set the font size for the entire figure
-        plt.rcParams.update({'font.size': 12})  # Adjust the font size as needed
-
         # create a bar chart
         ccs = self.class_counts_by_dataset()
 
@@ -325,9 +324,6 @@ class PredictionDataset(OutputDir):
                                        min_softmax_threshold=None):
         plt.figure()
 
-        # Set the font size for the entire figure
-        plt.rcParams.update({'font.size': 12})
-
         df = self.melt()
         cols = [col for col in df.columns if col in self.class_names()]
 
@@ -379,9 +375,6 @@ class PredictionDataset(OutputDir):
 
     def visualize_model_sets(self, min_softmax_threshold=0.5, color="black"):
         plt.figure()
-
-        # Set the font size for the entire figure
-        plt.rcParams.update({'font.size': 10})
 
         df = self.melt()
         cols = [col for col in df.columns if col in self.class_names()]
