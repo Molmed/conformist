@@ -219,7 +219,7 @@ class PredictionDataset(OutputDir):
 
         # Count how many datasets and create a grid of plots
         num_datasets = len(ccs.index.get_level_values(0).unique())
-        fig, axs = plt.subplots(num_datasets, 1, figsize=(10, 8 * num_datasets))
+        fig, axs = plt.subplots(num_datasets, 1, figsize=(10, 2 * num_datasets))
 
         if num_datasets == 1:
             axs = [axs]
@@ -250,22 +250,41 @@ class PredictionDataset(OutputDir):
                               color=bar_colors)
             axs[i].set_title(dataset)
 
+            # Padding
+            axs[i].margins(y=0.3)
+
             # Print count above each bar
             for j, v in enumerate(sorted_series):
                 if np.isfinite(v):
                     axs[i].text(j, v, str(v), ha='center', va='bottom')
 
             # Set x-axis labels to class names and rotate them vertically
-            axs[i].set_xticks(range(len(sorted_series.index)))
-            axs[i].set_xticklabels(sorted_series.index, rotation=90)
+            # axs[i].set_xticks(range(len(sorted_series.index)))
+            # axs[i].set_xticklabels(sorted_series.index, rotation=90)
+            # Remove x-axis labels
+            axs[i].set_xticks([])
+            # Remove xticks
+            axs[i].tick_params(axis='x', which='both', bottom=False, top=False)
 
             # Add legend
             # if i == 0:
             #     axs[i].legend(bars, sorted_series.index, title="Classes")
 
+        # Add a custom legend
+        legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in self.class_names()]
+        fig.legend(legend_handles,
+                   self.class_names(),
+                   title="Classes",
+                   loc='lower center',
+                   ncol=len(legend_handles)/2,
+                   bbox_to_anchor=(0.5, -0.05),  # Adjust position: (x, y)
+                   frameon=False  # Remove the frame around the legend
+                   )
+        fig.subplots_adjust(bottom=0.1)
+
         # Adjust layout to prevent overlap and add margin under each panel
         plt.tight_layout()
-        plt.subplots_adjust(hspace=0.5)  # Adjust hspace to add margin
+        plt.subplots_adjust(top=1)  # Adjust hspace to add margin
 
         # show the plot
         plt.savefig(f'{self.output_dir}/class_counts_by_dataset.png',
