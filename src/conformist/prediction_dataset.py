@@ -164,15 +164,20 @@ class PredictionDataset(OutputDir):
         # Return everything that is not in the exclusion list
         return cols
 
-    def run_reports(self, base_output_dir):
+    def run_reports(self,
+                    base_output_dir,
+                    upset_plot_color='black',
+                    min_softmax_threshold=0.5,
+                    ):
         self.create_output_dir(base_output_dir)
         self.visualize_class_counts()
         self.visualize_class_counts_by_dataset()
         self.visualize_prediction_heatmap()
         self.visualize_prediction_stripplot('prediction_stripplot_all')
-        self.visualize_prediction_stripplot('prediction_stripplot_0.5',
-                                            min_softmax_threshold=0.5)
-        self.visualize_model_sets(0.5, '#457b9d')
+        self.visualize_prediction_stripplot(
+            'prediction_stripplot_min_threshold',
+            min_softmax_threshold=min_softmax_threshold)
+        self.visualize_model_sets(0.5, upset_plot_color)
         print(f'Reports saved to {self.output_dir}')
 
     def _class_colors(self):
