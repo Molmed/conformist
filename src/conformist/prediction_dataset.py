@@ -225,7 +225,10 @@ class PredictionDataset(OutputDir):
             axs = [axs]
 
         # Group by the first level of the index (dataset) and count the number of unique classes
-        grouped_ccs = ccs.groupby(level=0).apply(lambda x: x.index.get_level_values(1).nunique())
+        # grouped_ccs = ccs.groupby(level=0).apply(lambda x: x.index.get_level_values(1).nunique())
+
+        # No, not number of classes, but sum of their values
+        grouped_ccs = ccs.groupby(level=0).sum()
 
         # Order datasets by number of unique classes
         ordered_datasets = grouped_ccs.sort_values(ascending=False).index
