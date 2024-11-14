@@ -7,8 +7,6 @@ from upsetplot import plot
 
 from .output_dir import OutputDir
 
-plt.rcParams.update({'font.size': 10})
-
 
 class PredictionDataset(OutputDir):
     DATASET_NAME_COL = 'dataset'
@@ -16,6 +14,11 @@ class PredictionDataset(OutputDir):
     KNOWN_CLASS_COL = 'known_class'
     PREDICTED_CLASS_COL = 'predicted_class'
     MELTED_KNOWN_CLASS_COL = 'melted_known_class'
+
+    FIGURE_FONTSIZE = 10
+    FIGURE_WIDTH = 12
+    plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+
 
     def __init__(self,
                  df=None,
@@ -231,7 +234,9 @@ class PredictionDataset(OutputDir):
 
         # Count how many datasets and create a grid of plots
         num_datasets = len(ccs.index.get_level_values(0).unique())
-        fig, axs = plt.subplots(num_datasets, 1, figsize=(10, 2 * num_datasets))
+        fig, axs = plt.subplots(num_datasets,
+                                1,
+                                figsize=(self.FIGURE_WIDTH, 2 * num_datasets))
 
         if num_datasets == 1:
             axs = [axs]
@@ -308,7 +313,7 @@ class PredictionDataset(OutputDir):
                     bbox_inches='tight')
 
     def visualize_prediction_heatmap(self):
-        plt.figure(figsize=(10, 8))
+        plt.figure(figsize=(self.FIGURE_WIDTH, 8))
 
         group_by_col = self.MELTED_KNOWN_CLASS_COL
         df = self.melt()
@@ -385,7 +390,7 @@ class PredictionDataset(OutputDir):
 
         # Increase the height of each row by adjusting the figure size
         num_classes = new_df['True class'].nunique()
-        plt.figure(figsize=(10, num_classes * 1))  # Adjust the height multiplier as needed
+        plt.figure(figsize=(self.FIGURE_WIDTH, num_classes * 1))  # Adjust the height multiplier as needed
 
         ax = plt.gca()
         # Add light gray background to every other row
