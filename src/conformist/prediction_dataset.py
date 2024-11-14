@@ -108,13 +108,17 @@ class PredictionDataset(OutputDir):
         self.df.to_csv(path, index=False)
 
     # Create a new df creating a new record for every known class
-    def melt(self):
+    def melt(self, primary_class_only=False):
         # Take KNOWN_CLASS_COL and split the values by comma into a new df with a column for each class
         known_classes_df = self.df[self.KNOWN_CLASS_COL].str.split(',', expand=True)
 
         # Label each column as known_class_1, known_class_2, etc.
         known_classes_df.columns = [f'{self.KNOWN_CLASS_COL}_{i+1}' for
                                     i in range(known_classes_df.shape[1])]
+
+        if primary_class_only:
+            # Keep only first column
+            known_classes_df = known_classes_df.iloc[:, 0:1]
 
         df = pd.concat([self.df, known_classes_df], axis=1)
 
@@ -140,8 +144,8 @@ class PredictionDataset(OutputDir):
         counts.index.name = None
         return counts
 
-    def class_counts_by_dataset(self):
-        counting_df = self.melt()
+    def class_counts_by_dataset(self, primary_class_only=False):
+        counting_df = self.melt(primary_class_only=primary_class_only)
         counts = counting_df.groupby([self.DATASET_NAME_COL, self.MELTED_KNOWN_CLASS_COL]).size()
         return counts
 
@@ -168,10 +172,11 @@ class PredictionDataset(OutputDir):
                     base_output_dir,
                     upset_plot_color='black',
                     min_softmax_threshold=0.5,
-                    ):
+                    primary_class_only_in_class_counts=False):
         self.create_output_dir(base_output_dir)
         self.visualize_class_counts()
-        self.visualize_class_counts_by_dataset()
+        self.visualize_class_counts_by_dataset(
+            primary_class_only=primary_class_only_in_class_counts)
         self.visualize_prediction_heatmap()
         self.visualize_prediction_stripplot('prediction_stripplot_all')
         self.visualize_prediction_stripplot(
@@ -213,11 +218,13 @@ class PredictionDataset(OutputDir):
         # show the plot
         plt.savefig(f'{self.output_dir}/class_counts.png', bbox_inches='tight')
 
-    def visualize_class_counts_by_dataset(self):
+    def visualize_class_counts_by_dataset(self,
+                                          primary_class_only=False):
         plt.figure()
 
         # create a bar chart
-        ccs = self.class_counts_by_dataset()
+        ccs = self.class_counts_by_dataset(
+            primary_class_only=primary_class_only)
 
         # Create a dictionary to map each class to a color
         class_to_color = self._class_colors()
@@ -278,11 +285,13 @@ class PredictionDataset(OutputDir):
             # if i == 0:
             #     axs[i].legend(bars, sorted_series.index, title="Classes")
 
+        title = 'Primary known class' if primary_class_only else 'Known class'
+
         # Add a custom legend
         legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in self.class_names()]
         fig.legend(legend_handles,
                    self.class_names(),
-                   title="Classes",
+                   title=title,
                    loc='lower center',
                    ncol=len(legend_handles)/2,
                    bbox_to_anchor=(0.5, -0.05),  # Adjust position: (x, y)
