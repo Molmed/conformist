@@ -387,6 +387,11 @@ class PredictionDataset(OutputDir):
         num_classes = new_df['True class'].nunique()
         plt.figure(figsize=(10, num_classes * 1))  # Adjust the height multiplier as needed
 
+        ax = plt.gca()
+        # Add light gray background to every other row
+        for i in range(0, num_classes, 2):
+            ax.axhspan(i - 0.5, i + 0.5, facecolor='#eeeeee', alpha=0.5)
+
         sns.stripplot(data=new_df,
                       x='Softmax score',
                       y='True class',
@@ -395,7 +400,8 @@ class PredictionDataset(OutputDir):
                         alpha=0.75,
                         dodge=True,
                         palette=self._class_colors(),
-                        size=4)
+                        size=4,
+                        ax=ax)
 
         # Create custom legend handles
         class_to_color = self._class_colors()
