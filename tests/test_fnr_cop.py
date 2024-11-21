@@ -8,6 +8,8 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 OUTPUT_DIR = f'{CURRENT_DIR}/output'
 INPUT_CSV = f'{CURRENT_DIR}/cal.csv'
 
+DO_CLEANUP = True
+
 
 def _cleanup():
     print(f'Cleaning up {OUTPUT_DIR}')
@@ -29,9 +31,13 @@ def test_prediction_dataset():
         calpd = PredictionDataset(predictions_csv=INPUT_CSV,
                                   dataset_name='my_cal_data')
 
-        calpd.run_reports(OUTPUT_DIR)
+        calpd.create_reports_dir(OUTPUT_DIR)
+        calpd.visualize_prediction_heatmap()
+        calpd.visualize_prediction_stripplot()
+        calpd.visualize_prediction_stripplot()
     finally:
-        _cleanup()
+        if DO_CLEANUP:
+            _cleanup()
 
 
 def test_fnr_cop():
@@ -47,5 +53,5 @@ def test_fnr_cop():
         trial = mcp.do_validation_trial(n_runs=10)
         trial.run_reports(OUTPUT_DIR)
     finally:
-        print("hi")
-        #_cleanup()
+        if DO_CLEANUP:
+            _cleanup()
