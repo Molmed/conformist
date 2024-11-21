@@ -180,24 +180,9 @@ class PredictionDataset(OutputDir):
         # Return everything that is not in the exclusion list
         return cols
 
-    def run_reports(self,
-                    base_output_dir,
-                    upset_plot_color='black',
-                    min_softmax_threshold=0.5,
-                    primary_class_only_in_class_counts=False,
-                    custom_color_palette=None):
-        self.create_output_dir(base_output_dir)
-        self.softmax_summary()
-        self.visualize_class_counts()
-        self.visualize_class_counts_by_dataset(
-            primary_class_only=primary_class_only_in_class_counts,
-            custom_color_palette=custom_color_palette)
-        self.visualize_prediction_heatmap()
-        self.visualize_prediction_stripplot(
-            'prediction_stripplot',
-            custom_color_palette=custom_color_palette)
-        self.visualize_model_sets(0.5, upset_plot_color)
-        print(f'Reports saved to {self.output_dir}')
+    def create_reports_dir(self, base_output_dir):
+        if self.output_dir is None:
+            self.create_output_dir(base_output_dir)
 
     def _class_colors(self, custom_color_palette=None):
         if custom_color_palette:
@@ -445,8 +430,6 @@ class PredictionDataset(OutputDir):
         plt.savefig(f'{self.output_dir}/softmax_summary.png', bbox_inches='tight')
 
     def visualize_prediction_stripplot(self,
-                                       output_filename_prefix,
-                                       min_softmax_threshold=None,
                                        custom_color_palette=None):
         plt.figure()
 
@@ -468,8 +451,7 @@ class PredictionDataset(OutputDir):
                     'Softmax score': row[col]
                 }
 
-                if min_softmax_threshold is None or row[col] >= min_softmax_threshold:
-                    rows.append(new_row)
+                rows.append(new_row)
 
         new_df = pd.concat([new_df, pd.DataFrame(rows)], ignore_index=True)
 
@@ -522,7 +504,8 @@ class PredictionDataset(OutputDir):
         # Save the plot to a file
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.5)
-        plt.savefig(f'{self.output_dir}/{output_filename_prefix}.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/prediction_stripplot.png',
+                    bbox_inches='tight')
 
     def visualize_model_sets(self, min_softmax_threshold=0.5, color="black"):
         plt.figure()
