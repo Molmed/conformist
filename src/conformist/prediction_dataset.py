@@ -187,6 +187,7 @@ class PredictionDataset(OutputDir):
                     primary_class_only_in_class_counts=False,
                     custom_color_palette=None):
         self.create_output_dir(base_output_dir)
+        self.softmax_summary()
         self.visualize_class_counts()
         self.visualize_class_counts_by_dataset(
             primary_class_only=primary_class_only_in_class_counts,
@@ -389,6 +390,59 @@ class PredictionDataset(OutputDir):
 
         # Save the plot to a file
         plt.savefig(f'{self.output_dir}/prediction_heatmap.png', bbox_inches='tight')
+
+    def softmax_summary(self):
+        df = self.melt()
+        softmax_cols = [col for col in df.columns if col in self.class_names()]
+
+        summary_df = pd.DataFrame(columns=['mean true positive softmax',
+                                           'mean false positive softmax'])
+
+        # For each col in softmax_cols, calculate the mean softmax score for the true class
+        # and the mean softmax score for the false classes
+        for col in softmax_cols:
+            true_pos = df[df[self.MELTED_KNOWN_CLASS_COL] == col]
+            false_pos = df[df[self.MELTED_KNOWN_CLASS_COL] != col]
+
+            # Get mean of all scores in column col in true_pos
+            mean_true_pos = true_pos[col].mean()
+            mean_false_pos = false_pos[col].mean()
+
+            summary_df.loc[col] = [mean_true_pos, mean_false_pos]
+
+        # Sort the DataFrame by mean true positive softmax
+        summary_df = summary_df.sort_values(by='mean true positive softmax',
+                                            ascending=False)
+
+        # Name index "Predicted class"
+        summary_df.index.name = 'Predicted class'
+
+        # Dump to csv
+        summary_df.to_csv(f'{self.output_dir}/softmax_summary.csv')
+
+        # Round all values to 4 decimal places
+        summary_df = summary_df.round(4)
+
+        # Pad the decimal places with zeros
+        summary_df = summary_df.applymap(lambda x: f'{x:.4f}')
+
+        # Visualize
+        plt.figure()
+        plt.axis('off')  # Hide axes
+
+        # Create table
+        table = plt.table(cellText=summary_df.values, colLabels=summary_df.columns, rowLabels=summary_df.index, loc='center', cellLoc='center')
+
+        # Make every other row gray
+        for i in range(0, len(summary_df), 2):
+            table.get_celld()[(i + 1, 0)].set_facecolor('#eeeeee')
+            table.get_celld()[(i + 1, 1)].set_facecolor('#eeeeee')
+
+        table.auto_set_font_size(False)
+        table.set_fontsize(self.FIGURE_FONTSIZE)
+        table.scale(1.2, 1.2)  # Scale table size
+
+        plt.savefig(f'{self.output_dir}/softmax_summary.png', bbox_inches='tight')
 
     def visualize_prediction_stripplot(self,
                                        output_filename_prefix,
