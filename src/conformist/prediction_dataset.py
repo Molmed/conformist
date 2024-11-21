@@ -175,21 +175,24 @@ class PredictionDataset(OutputDir):
                     base_output_dir,
                     upset_plot_color='black',
                     min_softmax_threshold=0.5,
-                    primary_class_only_in_class_counts=False):
+                    primary_class_only_in_class_counts=False,
+                    custom_color_palette=None):
         self.create_output_dir(base_output_dir)
         self.visualize_class_counts()
         self.visualize_class_counts_by_dataset(
-            primary_class_only=primary_class_only_in_class_counts)
+            primary_class_only=primary_class_only_in_class_counts,
+            custom_color_palette=custom_color_palette)
         self.visualize_prediction_heatmap()
-        self.visualize_prediction_stripplot('prediction_stripplot_all')
         self.visualize_prediction_stripplot(
-            'prediction_stripplot_min_threshold',
-            min_softmax_threshold=min_softmax_threshold)
+            'prediction_stripplot',
+            custom_color_palette=custom_color_palette)
         self.visualize_model_sets(0.5, upset_plot_color)
         print(f'Reports saved to {self.output_dir}')
 
-    def _class_colors(self):
-        # Define a colormap
+    def _class_colors(self, custom_color_palette=None):
+        if custom_color_palette:
+            return custom_color_palette
+
         colormap = plt.cm.get_cmap('tab20')
 
         # Create a dictionary to map each class to a color
@@ -222,7 +225,8 @@ class PredictionDataset(OutputDir):
         plt.savefig(f'{self.output_dir}/class_counts.png', bbox_inches='tight')
 
     def visualize_class_counts_by_dataset(self,
-                                          primary_class_only=False):
+                                          primary_class_only=False,
+                                          custom_color_palette=None):
         plt.figure()
 
         # create a bar chart
@@ -230,7 +234,8 @@ class PredictionDataset(OutputDir):
             primary_class_only=primary_class_only)
 
         # Create a dictionary to map each class to a color
-        class_to_color = self._class_colors()
+        class_to_color = self._class_colors(
+            custom_color_palette=custom_color_palette)
 
         # Count how many datasets and create a grid of plots
         num_datasets = len(ccs.index.get_level_values(0).unique())
@@ -362,7 +367,8 @@ class PredictionDataset(OutputDir):
 
     def visualize_prediction_stripplot(self,
                                        output_filename_prefix,
-                                       min_softmax_threshold=None):
+                                       min_softmax_threshold=None,
+                                       custom_color_palette=None):
         plt.figure()
 
         df = self.melt()
@@ -409,7 +415,8 @@ class PredictionDataset(OutputDir):
                         ax=ax)
 
         # Create custom legend handles
-        class_to_color = self._class_colors()
+        class_to_color = self._class_colors(
+            custom_color_palette=custom_color_palette)
         legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in new_df['Predicted class'].unique()]
 
         # Position the legend to the right of the plot with bars instead of dots
@@ -439,14 +446,13 @@ class PredictionDataset(OutputDir):
         # Set a multi-index
         upset_data.set_index(upset_data.columns.tolist(), inplace=True)
 
-        # upset = UpSet(upset_data)
-        # upset.add_catplot("violin")
         plot(upset_data,
              sort_by="cardinality",
              facecolor=color,
              show_counts="%d",
              show_percentages="{:.0%}",
-             orientation='horizontal')
+             orientation='horizontal',
+             min_subset_size=2)
         plt.savefig(f'{self.output_dir}/upset.png', bbox_inches='tight')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
