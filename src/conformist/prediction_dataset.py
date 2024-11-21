@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
 from matplotlib.patches import Patch
+from matplotlib.font_manager import FontProperties
 from upsetplot import plot
 
 from .output_dir import OutputDir
@@ -15,7 +16,7 @@ class PredictionDataset(OutputDir):
     PREDICTED_CLASS_COL = 'predicted_class'
     MELTED_KNOWN_CLASS_COL = 'melted_known_class'
 
-    FIGURE_FONTSIZE = 10
+    FIGURE_FONTSIZE = 12
     FIGURE_WIDTH = 12
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
@@ -318,15 +319,20 @@ class PredictionDataset(OutputDir):
 
         # Add a custom legend
         legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in class_names]
-        fig.legend(legend_handles,
-                   class_names,
-                   title=title,
-                   loc='lower center',
-                   ncol=len(legend_handles)/2,
-                   bbox_to_anchor=(0.5, -0.05),  # Adjust position: (x, y)
-                   frameon=False  # Remove the frame around the legend
-                   )
-        fig.subplots_adjust(bottom=0.1)
+        legend = fig.legend(legend_handles,
+                            class_names,
+                            title=title,
+                            loc='lower center',
+                            frameon=False,
+                            ncol=len(legend_handles)/4,
+                            bbox_to_anchor=(0.5, -0.15),  # Adjust position: (x, y)
+                            handletextpad=1,  # Increase padding between legend handle and text
+                            columnspacing=8  # Increase spacing between columns
+                            )
+        font_properties = FontProperties(weight='bold')
+        legend.get_title().set_font_properties(font_properties)
+
+        fig.subplots_adjust(bottom=0.2)
 
         # Adjust layout to prevent overlap and add margin under each panel
         plt.tight_layout()
@@ -422,9 +428,9 @@ class PredictionDataset(OutputDir):
         for i in range(0, num_classes, 2):
             ax.axhspan(i - 0.5, i + 0.5, facecolor='#eeeeee', alpha=0.5)
 
-        class_names = new_df['True class'].unique()
-        class_names = self._sort_class_names_by_palette(class_names,
-                                                        custom_color_palette)
+        class_names = self._sort_class_names_by_palette(
+            new_df['True class'].unique(),
+            custom_color_palette)
 
         sns.stripplot(data=new_df,
                       x='Softmax score',
@@ -443,10 +449,21 @@ class PredictionDataset(OutputDir):
         class_to_color = self._class_colors(
             custom_color_palette=custom_color_palette)
 
-        legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in class_names]
+        class_names = self._sort_class_names_by_palette(
+            new_df['Predicted class'].unique(),
+            custom_color_palette)
+        legend_handles = [Patch(color=class_to_color[cls], label=cls) for
+                          cls in class_names]
 
         # Position the legend to the right of the plot with bars instead of dots
-        plt.legend(handles=legend_handles, title="Predicted Classes", bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+        legend = plt.legend(handles=legend_handles,
+                            title="Predicted Classes",
+                            bbox_to_anchor=(1.05, 1),
+                            loc='upper left',
+                            borderaxespad=0.)
+
+        font_properties = FontProperties(weight='bold')
+        legend.get_title().set_font_properties(font_properties)
 
         # Save the plot to a file
         plt.tight_layout()
