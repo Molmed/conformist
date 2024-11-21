@@ -526,6 +526,7 @@ class PredictionDataset(OutputDir):
 
     def visualize_model_sets(self, min_softmax_threshold=0.5, color="black"):
         plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH, 8))
 
         df = self.melt()
         cols = [col for col in df.columns if col in self.class_names()]
@@ -549,7 +550,7 @@ class PredictionDataset(OutputDir):
              show_counts="%d",
              show_percentages="{:.0%}",
              orientation='horizontal',
-             min_subset_size=2)
+             min_subset_size=3)
         plt.savefig(f'{self.output_dir}/upset.png', bbox_inches='tight')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
