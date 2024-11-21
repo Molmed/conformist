@@ -120,8 +120,16 @@ class PredictionDataset(OutputDir):
                                     i in range(known_classes_df.shape[1])]
 
         if primary_class_only:
-            # Keep only first column
-            known_classes_df = known_classes_df.iloc[:, 0:1]
+            # For items with multiple known classes,
+            # change the first of the known_classes_df to 'multiclass'
+            # But first check if there are more than one known class columns
+            if known_classes_df.shape[1] > 1:
+                known_classes_df[f"{self.KNOWN_CLASS_COL}_1"] = known_classes_df.apply(
+                    lambda row: 'multiclass' if row[1] is not None else row[0],
+                    axis=1)
+
+                # Drop the other known class columns
+                known_classes_df = known_classes_df[[f"{self.KNOWN_CLASS_COL}_1"]]
 
         df = pd.concat([self.df, known_classes_df], axis=1)
 
@@ -233,6 +241,14 @@ class PredictionDataset(OutputDir):
         ccs = self.class_counts_by_dataset(
             primary_class_only=primary_class_only)
 
+        # Get unique class names from ccs
+        class_names = ccs.index.get_level_values(1).unique().sort_values()
+
+        # If color palette specified, sort class_names in same order
+        if isinstance(custom_color_palette, dict):
+            class_order = list(custom_color_palette.keys())
+            class_names = sorted(class_names, key=lambda x: class_order.index(x))
+
         # Create a dictionary to map each class to a color
         class_to_color = self._class_colors(
             custom_color_palette=custom_color_palette)
@@ -298,9 +314,9 @@ class PredictionDataset(OutputDir):
         title = 'Primary known class' if primary_class_only else 'Known class'
 
         # Add a custom legend
-        legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in self.class_names()]
+        legend_handles = [Patch(color=class_to_color[cls], label=cls) for cls in class_names]
         fig.legend(legend_handles,
-                   self.class_names(),
+                   class_names,
                    title=title,
                    loc='lower center',
                    ncol=len(legend_handles)/2,
