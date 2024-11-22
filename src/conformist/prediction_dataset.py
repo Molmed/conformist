@@ -248,7 +248,7 @@ class PredictionDataset(OutputDir):
         num_datasets = len(ccs.index.get_level_values(0).unique())
         fig, axs = plt.subplots(num_datasets,
                                 1,
-                                figsize=(self.FIGURE_WIDTH, 2 * num_datasets))
+                                figsize=(self.FIGURE_WIDTH, 2.5 * num_datasets))
 
         if num_datasets == 1:
             axs = [axs]
@@ -312,7 +312,7 @@ class PredictionDataset(OutputDir):
                             loc='lower center',
                             frameon=False,
                             ncol=len(legend_handles)/4,
-                            bbox_to_anchor=(0.5, -0.15),  # Adjust position: (x, y)
+                            bbox_to_anchor=(0.5, -0.125),  # Adjust position: (x, y)
                             handletextpad=1,  # Increase padding between legend handle and text
                             columnspacing=8  # Increase spacing between columns
                             )
@@ -447,8 +447,11 @@ class PredictionDataset(OutputDir):
         df = self.melt()
         softmax_cols = [col for col in df.columns if col in self.class_names()]
 
-        summary_df = pd.DataFrame(columns=['mean true positive softmax',
-                                           'mean false positive softmax'])
+        true_col_name = 'mean true positive softmax'
+        false_col_name = 'mean false positive softmax'
+
+        summary_df = pd.DataFrame(
+            columns=[true_col_name, false_col_name])
 
         # For each col in softmax_cols, calculate the mean softmax score for the true class
         # and the mean softmax score for the false classes
@@ -463,7 +466,7 @@ class PredictionDataset(OutputDir):
             summary_df.loc[col] = [mean_true_pos, mean_false_pos]
 
         # Sort the DataFrame by mean true positive softmax
-        summary_df = summary_df.sort_values(by='mean true positive softmax',
+        summary_df = summary_df.sort_values(by=true_col_name,
                                             ascending=False)
 
         # Name index "Predicted class"
@@ -483,16 +486,34 @@ class PredictionDataset(OutputDir):
         plt.axis('off')  # Hide axes
 
         # Create table
-        table = plt.table(cellText=summary_df.values, colLabels=summary_df.columns, rowLabels=summary_df.index, loc='center', cellLoc='center')
+        table = plt.table(cellText=summary_df.values,
+                          colLabels=summary_df.columns,
+                          rowLabels=summary_df.index,
+                          loc='left',
+                          cellLoc='center',
+                          )
+
+        plt.title('Predicted classes', weight='bold')
+
+        accent_color = "#d4cbb3"
+        # Make font color dark gray
+        font_color = '#222222'
+
+        # Change border colors
+        for key, cell in table.get_celld().items():
+            cell.set_edgecolor(accent_color)  # Set border color
+            cell.set_linewidth(1)      # Set border width
+            cell.get_text().set_color(font_color)
+            # cell.PAD = 0.2
 
         # Make every other row gray
         for i in range(0, len(summary_df), 2):
-            table.get_celld()[(i + 1, 0)].set_facecolor('#eeeeee')
-            table.get_celld()[(i + 1, 1)].set_facecolor('#eeeeee')
+            table.get_celld()[(i + 1, 0)].set_facecolor(accent_color)
+            table.get_celld()[(i + 1, 1)].set_facecolor(accent_color)
 
         table.auto_set_font_size(False)
         table.set_fontsize(self.FIGURE_FONTSIZE)
-        table.scale(1.2, 1.2)  # Scale table size
+        table.scale(2, 2)  # Scale table size
 
         plt.savefig(f'{self.output_dir}/softmax_summary.png', bbox_inches='tight')
 
