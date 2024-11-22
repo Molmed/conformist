@@ -21,7 +21,6 @@ class PredictionDataset(OutputDir):
     FIGURE_WIDTH = 12
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
-
     def __init__(self,
                  df=None,
                  predictions_csv=None,

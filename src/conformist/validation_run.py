@@ -53,6 +53,9 @@ class ValidationRun(OutputDir):
     def pct_singleton_or_duo_sets(self):
         return PerformanceReport.pct_singleton_or_duo_sets(self.prediction_sets)
 
+    def pct_duo_plus_sets(self):
+        return PerformanceReport.pct_duo_plus_sets(self.prediction_sets)
+
     def pct_trio_plus_sets(self):
         return PerformanceReport.pct_trio_plus_sets(self.prediction_sets)
 
@@ -130,6 +133,7 @@ class ValidationRun(OutputDir):
             'pct_empty_sets': self.pct_empty_sets(),
             'pct_singleton_sets': self.pct_singleton_sets(),
             'pct_singleton_or_duo_sets': self.pct_singleton_or_duo_sets(),
+            'pct_duo_plus_sets': self.pct_duo_plus_sets(),
             'pct_trio_plus_sets': self.pct_trio_plus_sets()
         }, index=[0])
 

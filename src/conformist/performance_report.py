@@ -28,10 +28,16 @@ class PerformanceReport(OutputDir):
                    prediction_set in prediction_sets) / \
                     len(prediction_sets)
 
-    def pct_trio_plus_sets(prediction_sets):
-        return sum(sum(prediction_set) >= 3 for
+    def _pct_sets_of_min_size(prediction_sets, min_size):
+        return sum(sum(prediction_set) >= min_size for
                    prediction_set in prediction_sets) / \
                     len(prediction_sets)
+
+    def pct_duo_plus_sets(prediction_sets):
+        return PerformanceReport._pct_sets_of_min_size(prediction_sets, 2)
+
+    def pct_trio_plus_sets(prediction_sets):
+        return PerformanceReport._pct_sets_of_min_size(prediction_sets, 3)
 
     def _class_report(self,
                       items_by_class,

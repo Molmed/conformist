@@ -8,6 +8,11 @@ from .prediction_dataset import PredictionDataset
 
 
 class AlphaSelector(OutputDir):
+    FIGURE_FONTSIZE = 12
+    FIGURE_WIDTH = 12
+    FIGURE_HEIGHT = 8
+    plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+
     def __init__(self,
                  prediction_dataset: PredictionDataset,
                  cop_class,
@@ -32,6 +37,7 @@ class AlphaSelector(OutputDir):
         self.pcts_empty_sets = []
         self.pcts_singleton_sets = []
         self.pcts_singleton_or_duo_sets = []
+        self.pcts_duo_plus_sets = []
         self.pcts_trio_plus_sets = []
         self.mean_false_negative_rates = []
         self.mean_softmax_threshold = []
@@ -54,6 +60,7 @@ class AlphaSelector(OutputDir):
             self.pcts_singleton_sets.append(trial.pct_singleton_sets())
             self.pcts_singleton_or_duo_sets.append(
                 trial.pct_singleton_or_duo_sets())
+            self.pcts_duo_plus_sets.append(trial.pct_duo_plus_sets())
             self.pcts_trio_plus_sets.append(trial.pct_trio_plus_sets())
             self.mean_false_negative_rates.append(
                 trial.mean_false_negative_rate())
@@ -69,7 +76,9 @@ class AlphaSelector(OutputDir):
 
     def visualize(self):
         # MEAN SET SIZES GRAPH
-        plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
+        plt.tight_layout()
 
         data = pd.DataFrame({
             'Alpha': self.alphas,
@@ -80,7 +89,10 @@ class AlphaSelector(OutputDir):
         plt.savefig(f'{self.output_dir}/alpha_to_mean_set_size.png')
 
         # PERCENT EMPTY/SINGLETON SETS GRAPH
-        plt.figure()
+        # MEAN SET SIZES GRAPH
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
+        plt.tight_layout()
 
         # Labels
         x_label = 'Alpha'
@@ -90,9 +102,9 @@ class AlphaSelector(OutputDir):
         # Create a DataFrame for the pct_empty_sets and pct_singleton_sets
         data = pd.DataFrame({
             x_label: self.alphas,
-            'n = 0': self.pcts_empty_sets,
-            'n ∈ {1, 2}': self.pcts_singleton_or_duo_sets,
-            'n ≥ 3': self.pcts_trio_plus_sets
+            'empty (n = 0)': self.pcts_empty_sets,
+            'certain (n=1)': self.pcts_singleton_or_duo_sets,
+            'uncertain (n ≥ 2)': self.pcts_duo_plus_sets
         })
 
         # Melt the DataFrame to have the set types as a separate column
@@ -110,14 +122,16 @@ class AlphaSelector(OutputDir):
         # Get the current x-tick labels
         labels = [item.get_text() for item in plt.gca().get_xticklabels()]
 
+        target = 'certain (n=1)'
+
         # Draw a horizontal line across the top of the highest orange bar
-        max_singleton_or_duo_sets = data['n ∈ {1, 2}'].max()
-        plt.axhline(y=max_singleton_or_duo_sets,
+        optimal_value = data[target].max()
+        plt.axhline(y=optimal_value,
                     color='#cccccc',
                     linestyle='--')
 
         # Get the index of the label with the highest value
-        idx = data['n ∈ {1, 2}'].idxmax()
+        idx = data[target].idxmax()
 
         # Make this label bold
         labels[idx] = f'$\\bf{{{labels[idx]}}}$'
@@ -131,7 +145,9 @@ class AlphaSelector(OutputDir):
         plt.savefig(f'{self.output_dir}/alpha_to_set_sizes.png')
 
     def visualize_lambdas(self):
-        plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
+        plt.tight_layout()
 
         # Only use reasonable alphas
         alphas = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4]
@@ -156,7 +172,7 @@ class AlphaSelector(OutputDir):
             plt.text(self.lamhats[a], 0 + padding,
                      f'{self.lamhats[a]:.2f}',
                      ha='center', va='bottom',
-                     fontsize=8, color='black',
+                     color='black',
                      weight='bold')
             i += 1
 
@@ -179,9 +195,8 @@ class AlphaSelector(OutputDir):
             'alpha': self.alphas,
             'Mean set size': self.mean_set_sizes,
             '% sets n=0': self.pcts_empty_sets,
-            '% sets n={1}': self.pcts_singleton_sets,
-            '% sets n={1|2}': self.pcts_singleton_or_duo_sets,
-            '% sets n>=3': self.pcts_trio_plus_sets,
+            '% sets n=1': self.pcts_singleton_sets,
+            '% sets n>=2': self.pcts_duo_plus_sets,
             'Mean FNR': self.mean_false_negative_rates,
             'Mean softmax threshold': self.mean_softmax_threshold
         }

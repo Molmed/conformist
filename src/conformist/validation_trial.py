@@ -36,6 +36,12 @@ class ValidationTrial(OutputDir):
             singleton_or_duo.append(run.pct_singleton_or_duo_sets())
         return statistics.mean(singleton_or_duo)
 
+    def pct_duo_plus_sets(self):
+        duo_plus = []
+        for run in self.runs:
+            duo_plus.append(run.pct_duo_plus_sets())
+        return statistics.mean(duo_plus)
+
     def pct_trio_plus_sets(self):
         trio_plus = []
         for run in self.runs:
