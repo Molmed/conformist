@@ -124,11 +124,10 @@ class ValidationTrial(OutputDir):
     def visualize_empirical_fnr(self):
         plt.figure(figsize=(self.FIGURE_WIDTH,
                             self.FIGURE_HEIGHT))
+        plt.tight_layout()
 
         # Generate a pastel palette
         color_palette = sns.color_palette("deep")
-
-        ax = plt.gca()
 
         fnrs = []
 
@@ -139,20 +138,37 @@ class ValidationTrial(OutputDir):
         mean_fnrs = round(self.mean_false_negative_rate(), 4)
 
         # Draw a histogram on the current subplot
-        sns.histplot(fnrs, kde=False, ax=ax, color=color_palette[2])
+        sns.histplot(fnrs,
+                     kde=False,
+                     color=color_palette[2])
+
+        # Remove the grid
+        plt.grid(False)
 
         # Draw a vertical line at the mean
-        ax.axvline(x=mean_fnrs, color='r', linestyle='--')
+        plt.axvline(x=mean_fnrs, color='r', linestyle='--')
 
         # Set the labels of the x-axis and y-axis
-        ax.set_xlabel('Mean run FNR')
-        ax.set_ylabel('n runs')
+        plt.xlabel('Mean run FNR')
+        plt.ylabel('n runs')
 
         # Add a label to the inner right-hand corner of the current subplot
-        ax.text(0.99, 0.95, f"Mean FNR across {len(self.runs)} runs: {mean_fnrs}", ha='right', va='top', transform=ax.transAxes)
+        # Get the current axes
+        ax = plt.gca()
+
+        # Add text annotation to the plot
+        ax.text(0.99,
+                0.95,
+                f"Mean FNR across {len(self.runs)} runs: {mean_fnrs}",
+                ha='right',
+                va='top',
+                transform=ax.transAxes)
 
         # Save the figure
         plt.savefig(f'{self.output_dir}/empirical_fnr.png')
+
+        # Clear the current figure
+        plt.clf()
 
     def visualize_class_performance(self):
         fnrs_by_class = self.mean_fnrs_by_class(self.class_names)

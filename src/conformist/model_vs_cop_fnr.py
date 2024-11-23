@@ -4,6 +4,11 @@ from . import OutputDir, PredictionDataset
 
 
 class ModelVsCopFNR(OutputDir):
+    FIGURE_FONTSIZE = 12
+    FIGURE_WIDTH = 12
+    FIGURE_HEIGHT = 8
+    plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+
     def __init__(self,
                  prediction_dataset: PredictionDataset,
                  cop_class,
@@ -57,7 +62,9 @@ class ModelVsCopFNR(OutputDir):
                                          'model_tprs': model_tprs}
 
     def run_reports(self):
-        plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
+        plt.tight_layout()
 
         model_rates = []
         model_mean = 0
@@ -91,5 +98,5 @@ class ModelVsCopFNR(OutputDir):
         plt.legend(loc='upper right')
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/model_vs_CoP_FNR.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/model_vs_CoP_FNR.png')
         print(f'Reports saved to {self.output_dir}')
