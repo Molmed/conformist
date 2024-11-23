@@ -53,6 +53,9 @@ class PerformanceReport(OutputDir):
         plt.figure(figsize=(self.FIGURE_WIDTH,
                             self.FIGURE_HEIGHT))
 
+        # Remove the grid
+        plt.grid(False)
+
         # Sort the dictionary by its values
         mean_sizes = dict(sorted(items_by_class.items(),
                                  key=lambda item: item[1]))
@@ -65,13 +68,22 @@ class PerformanceReport(OutputDir):
                   index=True, header=False)
 
         # Visualize this dict as a bar chart
-        sns.set_style('whitegrid')
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
+        # sns.set_style('whitegrid')
+        fig, ax = plt.subplots(figsize=(
+            self.FIGURE_WIDTH,
+            self.FIGURE_HEIGHT))
+        bars = ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
         ax.set_xticks(range(len(mean_sizes)))
         ax.set_xticklabels(mean_sizes.keys(), rotation='vertical')
         ax.set_ylabel(ylabel)
         ax.set_xlabel('True class')
+
+        # Print the number above each bar
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom')
+
+
         plt.tight_layout()
         plt.savefig(f'{self.output_dir}/{output_file_prefix}.png')
 
