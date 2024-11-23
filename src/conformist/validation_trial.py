@@ -8,6 +8,11 @@ from .performance_report import PerformanceReport
 
 
 class ValidationTrial(OutputDir):
+    FIGURE_FONTSIZE = 12
+    FIGURE_WIDTH = 12
+    FIGURE_HEIGHT = 8
+    plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+
     def __init__(self, runs, class_names=[]):
         self.runs = runs
         self.class_names = class_names
@@ -117,7 +122,8 @@ class ValidationTrial(OutputDir):
         print(f'Reports saved to {self.output_dir}')
 
     def visualize_empirical_fnr(self):
-        plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
 
         # Generate a pastel palette
         color_palette = sns.color_palette("deep")

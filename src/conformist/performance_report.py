@@ -5,6 +5,11 @@ from .output_dir import OutputDir
 
 
 class PerformanceReport(OutputDir):
+    FIGURE_FONTSIZE = 12
+    FIGURE_WIDTH = 12
+    FIGURE_HEIGHT = 8
+    plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+
     def __init__(self, base_output_dir):
         self.create_output_dir(base_output_dir)
 
@@ -45,7 +50,8 @@ class PerformanceReport(OutputDir):
                       ylabel,
                       color):
         # Reset plt
-        plt.figure()
+        plt.figure(figsize=(self.FIGURE_WIDTH,
+                            self.FIGURE_HEIGHT))
 
         # Sort the dictionary by its values
         mean_sizes = dict(sorted(items_by_class.items(),
