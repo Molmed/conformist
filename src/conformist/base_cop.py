@@ -11,7 +11,7 @@ from .output_dir import OutputDir
 from .performance_report import PerformanceReport
 
 
-DEFAULT_VALIDATION_PROPORTION = 0.25
+DEFAULT_VALIDATION_PROPORTION = 0.1
 
 
 class BaseCoP(OutputDir):
