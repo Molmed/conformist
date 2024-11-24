@@ -145,6 +145,7 @@ class BaseCoP(OutputDir):
             self.output_dir,
             upset_plot_color)
 
+        vr = None
         if validate:
             vr = ValidationRun(
                     self.val_idx,
@@ -170,7 +171,7 @@ class BaseCoP(OutputDir):
             df = pd.DataFrame(stats, index=[0])
             df.T.to_csv(f'{self.output_dir}/summary.csv', header=False)
 
-        return formatted_predictions
+        return formatted_predictions, vr
 
     def prediction_set_to_text(self, prediction_set, display_classes=None):
         class_names = self.class_names
