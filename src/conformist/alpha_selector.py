@@ -21,6 +21,7 @@ class AlphaSelector(OutputDir):
                  max_alpha=0.5,
                  increment_alpha=0.05,
                  n_runs_per_alpha=1000,
+                 val_proportion=0.1
                  ):
         self.create_output_dir(base_output_dir)
         self.cop_class = cop_class
@@ -29,6 +30,7 @@ class AlphaSelector(OutputDir):
         self.max_alpha = max_alpha
         self.increment_alpha = increment_alpha
         self.n_runs_per_alpha = n_runs_per_alpha
+        self.val_proportion = val_proportion
 
         # Initialize lists
         self.alphas = []
@@ -50,7 +52,8 @@ class AlphaSelector(OutputDir):
                            self.increment_alpha):
             alpha = round(a, 2)
             cop = self.cop_class(self.prediction_dataset, alpha=alpha)
-            trial = cop.do_validation_trial(n_runs=self.n_runs_per_alpha)
+            trial = cop.do_validation_trial(n_runs=self.n_runs_per_alpha,
+                                            val_proportion=self.val_proportion)
 
             # Store values for graphing
             self.alphas.append(alpha)
