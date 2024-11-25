@@ -130,7 +130,7 @@ class ValidationRun(OutputDir):
         np.seterr(all='raise')
         self.create_output_dir(base_output_dir)
 
-        df = pd.DataFrame({
+        stats = {
             'false_negative_rate': self.false_negative_rate(),
             'model_false_negative_rate': self.model_false_negative_rate(),
             'mean_set_size': self.mean_set_size(),
@@ -139,15 +139,16 @@ class ValidationRun(OutputDir):
             'pct_singleton_or_duo_sets': self.pct_singleton_or_duo_sets(),
             'pct_duo_plus_sets': self.pct_duo_plus_sets(),
             'pct_trio_plus_sets': self.pct_trio_plus_sets()
-        }, index=[0])
+        }
 
+        df = pd.DataFrame(stats, index=[0])
         df.T.to_csv(f'{self.output_dir}/summary.csv', header=False)
-
         print(f'Reports saved to {self.output_dir}')
 
         stats_dict = {
             'mean_set_sizes': mean_set_sizes,
             'mean_fnrs': mean_fnrs,
-            'mean_model_fnrs': mean_model_fnrs
+            'mean_model_fnrs': mean_model_fnrs,
+            'general_stats': stats
         }
         return stats_dict
