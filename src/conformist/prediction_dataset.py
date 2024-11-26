@@ -539,7 +539,7 @@ class PredictionDataset(OutputDir):
                           cellLoc='center',
                           )
 
-        plt.title('Predicted classes', weight='bold')
+        plt.title('Predicted class', weight='bold')
 
         accent_color = "#d4cbb3"
         # Make font color dark gray
@@ -625,13 +625,16 @@ class PredictionDataset(OutputDir):
         legend_handles = [Patch(color=class_to_color[cls], label=cls) for
                           cls in class_names]
 
-        # Position the legend to the right of the plot with bars instead of dots
-        legend = plt.legend(handles=legend_handles,
-                            title="Predicted Classes",
-                            bbox_to_anchor=(1.05, 1),
-                            loc='upper left',
-                            borderaxespad=0.)
-
+        legend = plt.legend(legend_handles,
+                            class_names,
+                            title="Predicted class",
+                            loc='lower center',
+                            frameon=False,
+                            ncol=4,
+                            bbox_to_anchor=(0.5, -0.2),  # Adjust position: (x, y)
+                            handletextpad=1,  # Increase padding between legend handle and text
+                            columnspacing=8  # Increase spacing between columns
+                            )
         font_properties = FontProperties(weight='bold')
         legend.get_title().set_font_properties(font_properties)
 
