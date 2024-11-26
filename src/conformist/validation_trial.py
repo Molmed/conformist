@@ -115,6 +115,24 @@ class ValidationTrial(OutputDir):
                 means[class_name] = statistics.mean(d_means)
         return means
 
+    def mean_prediction_counts_by_class(self, class_names, coocurring_only=False):
+        prediction_count_dicts = []
+        for run in self.runs:
+            prediction_count_dicts.append(run.prediction_counts_by_class(class_names, coocurring_only))
+
+        means = {}
+        for class_name in class_names:
+            d_means = []
+            for d in prediction_count_dicts:
+                if class_name in d:
+                    d_means.append(d[class_name])
+            if len(d_means) > 0:
+                means[class_name] = statistics.mean(d_means)
+
+        # Sort by count descending
+        means = dict(sorted(means.items(), key=lambda item: item[1], reverse=True))
+        return means
+
     def run_reports(self, base_output_dir):
         self.create_output_dir(base_output_dir)
         self.visualize_empirical_fnr()

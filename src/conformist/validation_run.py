@@ -117,6 +117,25 @@ class ValidationRun(OutputDir):
             averages[key] = sum(sizes) / len(sizes)
         return averages
 
+    def prediction_counts_by_class(self, class_names, coocurring_only=False):
+        counts = {}
+        for i in range(len(self.prediction_sets)):
+            labels = self.prediction_sets[i]
+
+            # Get corresponding values from class_names
+            pset_class_names = [class_names[i] for i, label in enumerate(labels) if label == 1]
+
+            do_count = True
+            if coocurring_only:
+                do_count = len(pset_class_names) > 1
+
+            if do_count:
+                for class_name in pset_class_names:
+                    class_counts = counts.get(class_name, 0)
+                    class_counts += 1
+                    counts[class_name] = class_counts
+        return counts
+
     def run_reports(self, base_output_dir):
         mean_set_sizes = self.mean_set_sizes_by_class(self.class_names)
         mean_fnrs = self.mean_fnrs_by_class(self.prediction_sets, self.class_names)
