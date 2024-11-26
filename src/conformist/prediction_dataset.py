@@ -335,17 +335,20 @@ class PredictionDataset(OutputDir):
         # Define a GridSpec with unequal column widths
         # Column 1 is nx as wide as column 2
         width_ratio = 8
-        gs = gridspec.GridSpec(1, 2, width_ratios=[width_ratio, 1])
+        gs = gridspec.GridSpec(1, 3, width_ratios=[width_ratio, 1, 1])
         ax1 = fig.add_subplot(gs[0, 0])
         ax2 = fig.add_subplot(gs[0, 1])
+        ax3 = fig.add_subplot(gs[0, 2])
 
         SET_SIZE_COL_NAME = "mean set size"
+        MEAN_FP_COL_NAME = "mean false positive softmax"
 
         group_by_col = self.MELTED_KNOWN_CLASS_COL
         df = self.melt()
         grouped_df = df.groupby(group_by_col)
         pred_col_names = self.class_names()
         set_size_col_names = [SET_SIZE_COL_NAME]
+        mean_fp_col_names = [MEAN_FP_COL_NAME]
 
         psets = self._get_prediction_sets_by_softmax_threshold(
             min_softmax_threshold)
@@ -364,20 +367,38 @@ class PredictionDataset(OutputDir):
 
         mean_smx = []
         mean_set_size = []
+        mean_fp_smx = []
 
         for name, group in grouped_df:
             mean_smx_row = [name]
             mean_set_size_row = [name]
+            mean_fp_smx_row = [name]
 
             for col in pred_col_names:
+                if col != name:
+                    mean_fp_smx_row.append(group[col].mean())
                 mean_smx_row.append(group[col].mean())
             mean_set_size_row.append(psets_df[name])
 
             mean_smx.append(mean_smx_row)
             mean_set_size.append(mean_set_size_row)
+            mean_fp_smx.append(mean_fp_smx_row)
+
+        # Iterate over rows in mean_fp_smx
+        new_mean_fp_smx = []
+        for row in mean_fp_smx:
+            # Pop the first element to get the class name
+            class_name = row.pop(0)
+            # Remove zeroes from row
+            row = [x for x in row if x != 0]
+            # Get mean of the row
+            mean = np.mean(row)
+            new_mean_fp_smx.append([class_name, mean])
+        mean_fp_smx = new_mean_fp_smx
 
         col_names_1 = ['true_class_name'] + pred_col_names
         col_names_2 = ['true_class_name'] + set_size_col_names
+        col_names_3 = ['true_class_name'] + mean_fp_col_names
 
         mean_smx_df = pd.DataFrame(mean_smx, columns=col_names_1)
         mean_smx_df.set_index('true_class_name', inplace=True)
@@ -385,12 +406,18 @@ class PredictionDataset(OutputDir):
         mean_set_size_df = pd.DataFrame(mean_set_size, columns=col_names_2)
         mean_set_size_df.set_index('true_class_name', inplace=True)
 
+        mean_fp_smx_df = pd.DataFrame(mean_fp_smx, columns=col_names_3)
+        mean_fp_smx_df.set_index('true_class_name', inplace=True)
+
         # Sort the rows and columns
         mean_smx_df.sort_index(axis=0, inplace=True)  # Sort rows
         mean_smx_df.sort_index(axis=1, inplace=True)  # Sort columns
 
         mean_set_size_df.sort_index(axis=0, inplace=True)  # Sort rows
         mean_set_size_df.sort_index(axis=1, inplace=True)  # Sort columns
+
+        mean_fp_smx_df.sort_index(axis=0, inplace=True)  # Sort rows
+        mean_fp_smx_df.sort_index(axis=1, inplace=True)  # Sort columns
 
         # Remove any columns where all the rows are 0
         mean_smx_df = mean_smx_df.loc[:, (mean_smx_df != 0).any(axis=0)]
@@ -411,31 +438,51 @@ class PredictionDataset(OutputDir):
                                  weight='bold', labelpad=labelpad)
 
         # Create second heatmap for mean set size
-        hm2 = sns.heatmap(mean_set_size_df,
+        hm2 = sns.heatmap(mean_fp_smx_df,
                     ax=ax2,
+                    cmap=sns.light_palette("forestgreen", as_cmap=True),
+                    annot=True,
+                    fmt='.2f',
+                    cbar=False)
+
+        hm2.set_ylabel("")
+
+        # Remove y ticks
+        hm2.set_yticks([])
+
+        # Remove x label
+        hm2.set_xlabel(r"$\overline{\mathrm{FP}}$",
+                       weight='bold')
+
+        # Remove x ticks
+        hm2.set_xticks([])
+
+        # Create third heatmap for mean set size
+        hm3 = sns.heatmap(mean_set_size_df,
+                    ax=ax3,
                     cmap=sns.light_palette("purple", as_cmap=True),
                     annot=True,
                     fmt='.2f',
                     cbar=False)
 
         # Rotate x labels
-        plt.setp(hm2.get_xticklabels(), rotation=90)
+        plt.setp(hm3.get_xticklabels(), rotation=90)
 
         # Set y label
-        hm2.set_ylabel(f"MEAN PREDICTION SET SIZE, SOFTMAX > {min_softmax_threshold}",
+        hm3.set_ylabel(f"MEAN PREDICTION SET SIZE, SOFTMAX > {min_softmax_threshold}",
                        weight='bold', labelpad=labelpad)
 
         # Position y label to the right of heatmap
-        hm2.yaxis.set_label_position("right")
+        hm3.yaxis.set_label_position("right")
 
         # Remove y ticks
-        hm2.set_yticks([])
+        hm3.set_yticks([])
 
         # Remove x label
-        hm2.set_xlabel('')
+        hm3.set_xlabel('')
 
         # Remove x ticks
-        hm2.set_xticks([])
+        hm3.set_xticks([])
 
         plt.tight_layout(w_pad=0.1)  # Control padding
 
