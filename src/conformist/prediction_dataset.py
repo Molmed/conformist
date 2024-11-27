@@ -227,7 +227,8 @@ class PredictionDataset(OutputDir):
 
     def visualize_class_counts_by_dataset(self,
                                           primary_class_only=False,
-                                          custom_color_palette=None):
+                                          custom_color_palette=None,
+                                          legend_top_padding=0.125):
         plt.figure()
 
         # create a bar chart
@@ -311,7 +312,7 @@ class PredictionDataset(OutputDir):
                             loc='lower center',
                             frameon=False,
                             ncol=len(legend_handles)/4,
-                            bbox_to_anchor=(0.5, -0.125),  # Adjust position: (x, y)
+                            bbox_to_anchor=(0.5, 0-legend_top_padding),  # Adjust position: (x, y)
                             handletextpad=1,  # Increase padding between legend handle and text
                             columnspacing=8  # Increase spacing between columns
                             )
@@ -450,9 +451,10 @@ class PredictionDataset(OutputDir):
         # Remove y ticks
         hm2.set_yticks([])
 
-        # Remove x label
-        hm2.set_xlabel(r"$\overline{\mathrm{FP}}$",
-                       weight='bold')
+        # Add label
+        hm2.set_xlabel("mean softmax\nfalse positive",
+                       weight='bold',
+                       rotation=90)
 
         # Remove x ticks
         hm2.set_xticks([])
