@@ -5,7 +5,7 @@ from .output_dir import OutputDir
 
 
 class PerformanceReport(OutputDir):
-    FIGURE_FONTSIZE = 12
+    FIGURE_FONTSIZE = 16
     FIGURE_WIDTH = 12
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
@@ -74,14 +74,22 @@ class PerformanceReport(OutputDir):
             self.FIGURE_HEIGHT))
         bars = ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
         ax.set_xticks(range(len(mean_sizes)))
-        ax.set_xticklabels(mean_sizes.keys(), rotation='vertical')
-        ax.set_ylabel(ylabel)
-        ax.set_xlabel('True class')
+        ax.set_xticklabels(mean_sizes.keys(),
+                           rotation='vertical')
+        ax.tick_params(axis='both',
+                       labelsize=PerformanceReport.FIGURE_FONTSIZE)
+        ax.set_ylabel(ylabel,
+                      fontsize=PerformanceReport.FIGURE_FONTSIZE)
+        ax.set_xlabel('True class', fontsize=PerformanceReport.FIGURE_FONTSIZE)
 
         # Print the number above each bar
         for bar in bars:
             height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}', ha='center', va='bottom')
+            ax.text(
+                bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}',
+                ha='center',
+                va='bottom',
+                fontsize=PerformanceReport.FIGURE_FONTSIZE)
 
 
         plt.tight_layout()
