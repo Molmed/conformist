@@ -5,6 +5,7 @@
 <link href="readme.css" rel="stylesheet">
 
 
+[![DOI](https://zenodo.org/badge/820298858.svg)](https://doi.org/10.5281/zenodo.14329248)
 [![Python package](https://github.com/Molmed/conformist/actions/workflows/python-package.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-package.yml)
 [![Upload Python Package](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Molmed/conformist/actions/workflows/python-publish.yml)
 
