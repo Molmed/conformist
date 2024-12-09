@@ -11,7 +11,7 @@
 
 <h1 class="custom-font miami-neon-text">Conformist</h1>
 
-Conformist v1.1.0 is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
+Conformist v1.1.1 is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
 
 *BaseCoP* contains utility functions common to all conformal predictors, such as splitting data into calibration and validation sets, and setting up runs. It is extended by *FNRCoP* that implements conformal risk control.
 
