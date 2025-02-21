@@ -71,11 +71,23 @@ class ValidationTrial(OutputDir):
             tps.append(run.true_positive_rate())
         return statistics.mean(tps)
 
+    def mean_FPR(self):
+        fps = []
+        for run in self.runs:
+            fps.append(run.FPR())
+        return statistics.mean(fps)
+
     def mean_model_true_positive_rate(self):
         tps = []
         for run in self.runs:
             tps.append(run.model_true_positive_rate())
         return statistics.mean(tps)
+
+    def mean_model_false_positive_rate(self):
+        fps = []
+        for run in self.runs:
+            fps.append(run.model_false_positive_rate())
+        return statistics.mean(fps)
 
     def mean_softmax_threshold(self):
         return sum(run.softmax_threshold for run in self.runs) / len(self.runs)

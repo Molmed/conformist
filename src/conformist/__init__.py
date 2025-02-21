@@ -7,3 +7,4 @@ from .validation_trial import ValidationTrial
 from .validation_run import ValidationRun
 from .model_vs_cop_fnr import ModelVsCopFNR
 from .performance_report import PerformanceReport
+from .roc import ROC

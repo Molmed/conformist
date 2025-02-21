@@ -71,9 +71,32 @@ class ValidationRun(OutputDir):
         return ((self.prediction_sets * self.labels_idx).sum(axis=1) /
                 (self.labels_idx.sum(axis=1) + self.EPSILON)).mean()
 
+    def false_positive_rate(self):
+        print((self.prediction_sets * (1 - self.labels_idx)).sum(axis=1))
+        return ((self.prediction_sets * (1 - self.labels_idx)).sum(axis=1) /
+                ((1 - self.labels_idx).sum(axis=1) + self.EPSILON)).mean()
+
+    def FPR(self):
+        fps = ((self.prediction_sets * (1 - self.labels_idx)).sum(axis=1))
+        tns = np.array([
+            len(np.setdiff1d(labels, predictions))
+            for labels, predictions in zip(self.labels_idx, self.prediction_sets)
+        ])
+
+        # Get sums of tns and fps
+        tns = tns.sum()
+        fps = fps.sum()
+
+        return fps / (fps + tns)
+
+
     def model_true_positive_rate(self):
         return ((self.model_predictions * self.labels_idx).sum(axis=1) /
                 (self.labels_idx.sum(axis=1) + self.EPSILON)).mean()
+
+    def model_false_positive_rate(self):
+        return ((self.model_predictions * (1 - self.labels_idx)).sum(axis=1) /
+                ((1 - self.labels_idx).sum(axis=1) + self.EPSILON)).mean()
 
     def bin_set_sizes_by_class(self, class_names):
         set_sizes = {}
