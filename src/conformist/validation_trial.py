@@ -13,7 +13,9 @@ class ValidationTrial(OutputDir):
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
-    def __init__(self, runs, class_names=[]):
+    def __init__(self,
+                 runs,
+                 class_names=[]):
         self.runs = runs
         self.class_names = class_names
 
@@ -71,6 +73,7 @@ class ValidationTrial(OutputDir):
             tps.append(run.true_positive_rate())
         return statistics.mean(tps)
 
+    # TODO: rename
     def mean_FPR(self):
         fps = []
         for run in self.runs:
@@ -82,12 +85,6 @@ class ValidationTrial(OutputDir):
         for run in self.runs:
             tps.append(run.model_true_positive_rate())
         return statistics.mean(tps)
-
-    def mean_model_false_positive_rate(self):
-        fps = []
-        for run in self.runs:
-            fps.append(run.model_false_positive_rate())
-        return statistics.mean(fps)
 
     def mean_softmax_threshold(self):
         return sum(run.softmax_threshold for run in self.runs) / len(self.runs)

@@ -34,11 +34,47 @@ class ROC(OutputDir):
         self.model_tpr_list = []
         self.model_fpr_list = []
 
+    def uncalibrated_model_rates(self, alphas):
+        # Compute TPR and FPR for the uncalibrated model
+        model_tpr = []
+        model_fpr = []
+
+        for alpha in alphas:
+            prediction_sets = self.prediction_dataset.smx >= alpha
+
+            # TPR calculation
+            tps = ((prediction_sets * self.prediction_dataset.labels_idx).sum(axis=1))
+            fns = ((~prediction_sets * self.prediction_dataset.labels_idx).sum(axis=1))
+
+            # Get sums of tps and fns
+            tps = tps.sum()
+            fns = fns.sum()
+
+            model_tpr.append(tps / (tps + fns))
+
+            # FPS calculation
+            fps = ((prediction_sets * (1 - self.prediction_dataset.labels_idx)).sum(axis=1))
+            tns = np.array([
+                len(np.setdiff1d(labels, predictions))
+                for labels, predictions in zip(self.prediction_dataset.labels_idx, prediction_sets)
+            ])
+
+            # Get sums of tns and fps
+            tns = tns.sum()
+            fps = fps.sum()
+
+            model_fpr.append(fps / (fps + tns))
+
+        return model_tpr, model_fpr
+
     def run(self):
         # Define a range of significance levels (alpha values)
         alpha_levels = np.linspace(self.min_alpha,
                                    self.max_alpha,
                                    self.n_alphas)
+
+        self.model_tpr_list, self.model_fpr_list = \
+            self.uncalibrated_model_rates(alpha_levels)
 
         # Compute TPR and FPR for different alpha thresholds
         for alpha in alpha_levels:
@@ -47,29 +83,15 @@ class ROC(OutputDir):
             trial = cop.do_validation_trial(n_runs=self.n_runs_per_alpha)
 
             mean_cp_tpr = trial.mean_true_positive_rate()
-            mean_model_tpr = trial.mean_model_true_positive_rate()
-
             mean_cp_fpr = trial.mean_FPR()
-            mean_model_fpr = trial.mean_model_false_positive_rate()
 
             self.cp_tpr_list.append(mean_cp_tpr)
             self.cp_fpr_list.append(mean_cp_fpr)
-
-            print(f'mean_cp_tpr={mean_cp_tpr}, mean_model_tpr={mean_model_tpr}')
-            print(f'mean_cp_fpr={mean_cp_fpr}, mean_model_fpr={mean_model_fpr}')
-
-            self.model_tpr_list.append(mean_model_tpr)
-            self.model_fpr_list.append(mean_model_fpr)
 
         # Ensure x values are sorted in ascending order
         sorted_indices = np.argsort(self.cp_fpr_list)
         self.cp_fpr_list = np.array(self.cp_fpr_list)[sorted_indices]
         self.cp_tpr_list = np.array(self.cp_tpr_list)[sorted_indices]
-
-        # Do same for model
-        sorted_indices = np.argsort(self.model_fpr_list)
-        self.model_fpr_list = np.array(self.model_fpr_list)[sorted_indices]
-        self.model_tpr_list = np.array(self.model_tpr_list)[sorted_indices]
 
     def run_reports(self):
         plt.figure(figsize=(self.FIGURE_WIDTH, self.FIGURE_HEIGHT))
