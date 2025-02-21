@@ -49,8 +49,9 @@ class ROC(OutputDir):
             # Get sums of tps and fns
             tps = tps.sum()
             fns = fns.sum()
+            tpr = tps / (tps + fns)
 
-            model_tpr.append(tps / (tps + fns))
+            model_tpr.append(tpr)
 
             # FPS calculation
             fps = ((prediction_sets * (1 - self.prediction_dataset.labels_idx)).sum(axis=1))
@@ -62,8 +63,9 @@ class ROC(OutputDir):
             # Get sums of tns and fps
             tns = tns.sum()
             fps = fps.sum()
+            fpr = fps / (fps + tns)
 
-            model_fpr.append(fps / (fps + tns))
+            model_fpr.append(fpr)
 
         return model_tpr, model_fpr
 

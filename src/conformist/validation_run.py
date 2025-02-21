@@ -87,6 +87,9 @@ class ValidationRun(OutputDir):
         tns = tns.sum()
         fps = fps.sum()
 
+        if (fps + tns) == 0:
+            tns = self.EPSILON
+
         return fps / (fps + tns)
 
 
