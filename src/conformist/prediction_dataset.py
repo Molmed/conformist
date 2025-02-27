@@ -241,6 +241,9 @@ class PredictionDataset(OutputDir):
                                           legend_top_padding=0.125):
         plt.figure()
 
+        # Set fontsize to 6
+        plt.rcParams.update({'font.size': 6})
+
         # create a bar chart
         ccs = self.class_counts_by_dataset(
             primary_class_only=primary_class_only)
@@ -257,8 +260,7 @@ class PredictionDataset(OutputDir):
         # Count how many datasets and create a grid of plots
         num_datasets = len(ccs.index.get_level_values(0).unique())
         fig, axs = plt.subplots(num_datasets,
-                                1,
-                                figsize=(self.FIGURE_WIDTH, 2.5 * num_datasets))
+                                1)
 
         if num_datasets == 1:
             axs = [axs]
@@ -324,7 +326,7 @@ class PredictionDataset(OutputDir):
                             ncol=len(legend_handles)/4,
                             bbox_to_anchor=(0.5, 0-legend_top_padding),  # Adjust position: (x, y)
                             handletextpad=1,  # Increase padding between legend handle and text
-                            columnspacing=8  # Increase spacing between columns
+                            columnspacing=2  # Increase spacing between columns
                             )
         font_properties = FontProperties(weight='bold')
         legend.get_title().set_font_properties(font_properties)
@@ -334,6 +336,8 @@ class PredictionDataset(OutputDir):
         # Adjust layout to prevent overlap and add margin under each panel
         plt.tight_layout()
         plt.subplots_adjust(top=1)  # Adjust hspace to add margin
+
+        fig.set_size_inches(3.75, 5)
 
         # show the plot
         plt.savefig(f'{self.output_dir}/class_counts_by_dataset.pdf',
