@@ -21,6 +21,16 @@ class PredictionDataset(OutputDir):
     FIGURE_WIDTH = 12
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
+    # plt.rc('axes', titlesize=16)   # Title font size
+    # plt.rc('axes', labelsize=14)   # X and Y label font size
+    # plt.rc('xtick', labelsize=12)  # X-axis tick font size
+    # plt.rc('ytick', labelsize=12)  # Y-axis tick font size
+    # plt.rc('legend', fontsize=12)  # Legend font size
+
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers"  # Choose a font that supports embedding
+
+
     def __init__(self,
                  df=None,
                  predictions_csv=None,
@@ -217,7 +227,7 @@ class PredictionDataset(OutputDir):
         ccs.to_csv(f'{self.output_dir}/class_counts.csv')
 
         # show the plot
-        plt.savefig(f'{self.output_dir}/class_counts.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/class_counts.pdf', bbox_inches='tight', format='pdf')
 
     def _sort_class_names_by_palette(self, class_names, custom_color_palette):
         if isinstance(custom_color_palette, dict):
@@ -326,8 +336,8 @@ class PredictionDataset(OutputDir):
         plt.subplots_adjust(top=1)  # Adjust hspace to add margin
 
         # show the plot
-        plt.savefig(f'{self.output_dir}/class_counts_by_dataset.png',
-                    bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/class_counts_by_dataset.pdf',
+                    bbox_inches='tight', format='pdf')
 
     def visualize_prediction_heatmap(self, min_softmax_threshold=0.5):
         fig = plt.figure(figsize=(self.FIGURE_WIDTH, 10))
@@ -490,7 +500,7 @@ class PredictionDataset(OutputDir):
         plt.tight_layout(w_pad=0.1)  # Control padding
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/prediction_heatmap.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/prediction_heatmap.pdf', bbox_inches='tight', format='pdf')
 
     def softmax_summary(self):
         df = self.melt()
@@ -564,7 +574,7 @@ class PredictionDataset(OutputDir):
         table.set_fontsize(self.FIGURE_FONTSIZE)
         table.scale(2, 2)  # Scale table size
 
-        plt.savefig(f'{self.output_dir}/softmax_summary.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/softmax_summary.pdf', bbox_inches='tight', format='pdf')
 
     def visualize_prediction_stripplot(self,
                                        custom_color_palette=None):
@@ -644,8 +654,8 @@ class PredictionDataset(OutputDir):
         # Save the plot to a file
         plt.tight_layout()
         plt.subplots_adjust(hspace=0.5)
-        plt.savefig(f'{self.output_dir}/prediction_stripplot.png',
-                    bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/prediction_stripplot.pdf',
+                    bbox_inches='tight', format='pdf')
 
     def _get_prediction_sets_by_softmax_threshold(self, min_softmax_threshold=0.5):
         df = self.melt()
@@ -678,7 +688,7 @@ class PredictionDataset(OutputDir):
              show_percentages="{:.0%}",
              orientation='horizontal',
              min_subset_size=3)
-        plt.savefig(f'{self.output_dir}/upset.png', bbox_inches='tight')
+        plt.savefig(f'{self.output_dir}/upset.pdf', bbox_inches='tight', format='pdf')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
         # Make a copy of the DataFrame
