@@ -13,6 +13,10 @@ class AlphaSelector(OutputDir):
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers, DejaVu Sans"  # Choose a font that supports embedding
+
+
     def __init__(self,
                  prediction_dataset: PredictionDataset,
                  cop_class,
@@ -78,9 +82,10 @@ class AlphaSelector(OutputDir):
         print(f'Reports saved to {self.output_dir}')
 
     def visualize(self):
-        # MEAN SET SIZES GRAPH
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
+        plt.tight_layout()
+        plt.rcParams.update({'font.size': 8})
+
         plt.tight_layout()
 
         data = pd.DataFrame({
@@ -89,12 +94,13 @@ class AlphaSelector(OutputDir):
         })
 
         sns.lineplot(data=data, x='Alpha', y='Mean Set Size')
-        plt.savefig(f'{self.output_dir}/alpha_to_mean_set_size.png')
+        plt.savefig(f'{self.output_dir}/alpha_to_mean_set_size.pdf', format='pdf')
 
         # PERCENT EMPTY/SINGLETON SETS GRAPH
         # MEAN SET SIZES GRAPH
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
+        plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
         plt.tight_layout()
 
         # Labels
@@ -145,12 +151,14 @@ class AlphaSelector(OutputDir):
         plt.legend(loc='upper right', title=legend_title)
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/alpha_to_set_sizes.png')
+        fig.set_size_inches(4, 3)
+        plt.tight_layout(w_pad=0)
+        plt.savefig(f'{self.output_dir}/alpha_to_set_sizes.pdf', format='pdf', pad_inches = 0)
 
     def visualize_lambdas(self):
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
         plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
 
         # Only use reasonable alphas
         alphas = [0.05, 0.1, 0.15, 0.2, 0.3, 0.4]
@@ -186,10 +194,12 @@ class AlphaSelector(OutputDir):
 
         plt.xlabel('λ')
         plt.ylabel('Constraint function f(λ)')
-        plt.title(f'FNR-controlling threshold {SYM_LAMHAT}')
+        # plt.title(f'FNR-controlling threshold {SYM_LAMHAT}')
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/lambdas.png')
+        fig.set_size_inches(4, 3)
+        plt.tight_layout(w_pad=0)
+        plt.savefig(f'{self.output_dir}/lambdas.pdf', format='pdf')
 
     def save_summary(self):
         # Export the statistics to CSV
