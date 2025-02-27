@@ -344,12 +344,14 @@ class PredictionDataset(OutputDir):
                     bbox_inches='tight', format='pdf')
 
     def visualize_prediction_heatmap(self, min_softmax_threshold=0.5):
-        fig = plt.figure(figsize=(self.FIGURE_WIDTH, 10))
+        fig = plt.figure()
+        plt.rcParams.update({'font.size': 6})
+        # fig = plt.figure(figsize=(self.FIGURE_WIDTH, 10))
 
         # Create two subplots, we will create two separate heatmaps
         # Define a GridSpec with unequal column widths
         # Column 1 is nx as wide as column 2
-        width_ratio = 8
+        width_ratio = 13.5
         gs = gridspec.GridSpec(1, 3, width_ratios=[width_ratio, 1, 1])
         ax1 = fig.add_subplot(gs[0, 0])
         ax2 = fig.add_subplot(gs[0, 1])
@@ -444,13 +446,15 @@ class PredictionDataset(OutputDir):
                  fmt='.2f',
                  cbar=False)
 
-        labelpad = 20
         plt.setp(hm.get_yticklabels(), rotation=0)
 
         hm.set_xlabel('MEAN SOFTMAX SCORE',
-                                 weight='bold', labelpad=labelpad)
+                                 weight='bold', labelpad=10)
         hm.set_ylabel('TRUE CLASS',
-                                 weight='bold', labelpad=labelpad)
+                                 weight='bold', labelpad=-10)
+
+        hm.yaxis.set_tick_params(pad=0)
+        hm.xaxis.set_tick_params(pad=0)
 
         # Create second heatmap for mean set size
         hm2 = sns.heatmap(mean_fp_smx_df,
@@ -501,10 +505,12 @@ class PredictionDataset(OutputDir):
         # Remove x ticks
         hm3.set_xticks([])
 
-        plt.tight_layout(w_pad=0.1)  # Control padding
+        plt.tight_layout(w_pad=0)  # Control padding
+
+        fig.set_size_inches(4, 4)
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/prediction_heatmap.pdf', bbox_inches='tight', format='pdf')
+        plt.savefig(f'{self.output_dir}/prediction_heatmap.pdf', bbox_inches='tight', format='pdf', pad_inches = 0)
 
     def softmax_summary(self):
         df = self.melt()
@@ -581,8 +587,14 @@ class PredictionDataset(OutputDir):
         plt.savefig(f'{self.output_dir}/softmax_summary.pdf', bbox_inches='tight', format='pdf')
 
     def visualize_prediction_stripplot(self,
-                                       custom_color_palette=None):
-        plt.figure()
+                                       custom_color_palette=None,
+                                       legend_top_padding=0.125):
+        fig = plt.figure()
+
+        # Set fontsize to 6
+        plt.rcParams.update({'font.size': 6})
+
+        # figsize=(self.FIGURE_WIDTH, 2.5 * num_datasets)
 
         df = self.melt()
         cols = [col for col in df.columns if col in self.class_names()]
@@ -608,7 +620,7 @@ class PredictionDataset(OutputDir):
 
         # Increase the height of each row by adjusting the figure size
         num_classes = new_df['True class'].nunique()
-        plt.figure(figsize=(self.FIGURE_WIDTH, num_classes * 1))  # Adjust the height multiplier as needed
+        # plt.figure(figsize=(self.FIGURE_WIDTH, num_classes * 1))  # Adjust the height multiplier as needed
 
         ax = plt.gca()
         # Add light gray background to every other row
@@ -628,7 +640,7 @@ class PredictionDataset(OutputDir):
                         dodge=True,
                         palette=self._class_colors(
                             custom_color_palette=custom_color_palette),
-                        size=4,
+                        size=2,
                         ax=ax,
                         order=class_names)
 
@@ -648,16 +660,30 @@ class PredictionDataset(OutputDir):
                             loc='lower center',
                             frameon=False,
                             ncol=4,
-                            bbox_to_anchor=(0.5, -0.2),  # Adjust position: (x, y)
+                            bbox_to_anchor=(0.35, -0.2),
                             handletextpad=1,  # Increase padding between legend handle and text
-                            columnspacing=8  # Increase spacing between columns
+                            columnspacing=2  # Increase spacing between columns
                             )
+
+        # legend = fig.legend(legend_handles,
+        #                     class_names,
+        #                     title=title,
+        #                     loc='lower center',
+        #                     frameon=False,
+        #                     ncol=len(legend_handles)/4,
+        #                     bbox_to_anchor=(0.5, 0-legend_top_padding),  # Adjust position: (x, y)
+        #                     handletextpad=1,  # Increase padding between legend handle and text
+        #                     columnspacing=2  # Increase spacing between columns
+        #                     )
         font_properties = FontProperties(weight='bold')
         legend.get_title().set_font_properties(font_properties)
 
+        # plt.tight_layout()
+
+        fig.set_size_inches(3.75, 6)
+
         # Save the plot to a file
-        plt.tight_layout()
-        plt.subplots_adjust(hspace=0.5)
+        # plt.subplots_adjust(hspace=0.5)
         plt.savefig(f'{self.output_dir}/prediction_stripplot.pdf',
                     bbox_inches='tight', format='pdf')
 
@@ -678,20 +704,28 @@ class PredictionDataset(OutputDir):
 
 
     def visualize_model_sets(self, min_softmax_threshold=0.5, color="black"):
-        plt.figure()
-        plt.figure(figsize=(self.FIGURE_WIDTH, 8))
+        fig = plt.figure(figsize=(3.75, 5))
+        # fig.set_size_inches(3.75, 1)
+
+        # Set fontsize to 6
+        plt.rcParams.update({'font.size': 6})
+
         upset_data = self._get_prediction_sets_by_softmax_threshold(
             min_softmax_threshold)
         # Set a multi-index
         upset_data.set_index(upset_data.columns.tolist(), inplace=True)
 
-        plot(upset_data,
+        plts = plot(upset_data,
+             fig=fig,
+             element_size=9,
              sort_by="cardinality",
              facecolor=color,
-             show_counts="%d",
-             show_percentages="{:.0%}",
+             show_counts="%d ",
+             show_percentages=False,
              orientation='horizontal',
              min_subset_size=3)
+
+
         plt.savefig(f'{self.output_dir}/upset.pdf', bbox_inches='tight', format='pdf')
 
     def prediction_sets_df(self, prediction_sets, export_to_dir=None):
