@@ -13,6 +13,10 @@ class ValidationTrial(OutputDir):
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers, DejaVu Sans"  # Choose a font that supports embedding
+
+
     def __init__(self,
                  runs,
                  class_names=[]):
@@ -149,9 +153,10 @@ class ValidationTrial(OutputDir):
         print(f'Reports saved to {self.output_dir}')
 
     def visualize_empirical_fnr(self):
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
         plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
+
 
         # Generate a pastel palette
         color_palette = sns.color_palette("deep")
@@ -192,7 +197,10 @@ class ValidationTrial(OutputDir):
                 transform=ax.transAxes)
 
         # Save the figure
-        plt.savefig(f'{self.output_dir}/empirical_fnr.png')
+        fig.set_size_inches(4, 3)
+        plt.tight_layout(w_pad=0)
+
+        plt.savefig(f'{self.output_dir}/empirical_fnr.pdf', format='pdf')
 
         # Clear the current figure
         plt.clf()

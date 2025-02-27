@@ -9,6 +9,10 @@ class ModelVsCopFNR(OutputDir):
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers, DejaVu Sans"  # Choose a font that supports embedding
+
+
     def __init__(self,
                  prediction_dataset: PredictionDataset,
                  cop_class,
@@ -62,9 +66,10 @@ class ModelVsCopFNR(OutputDir):
                                          'model_tprs': model_tprs}
 
     def run_reports(self):
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
         plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
+
 
         model_rates = []
         model_mean = 0
@@ -98,5 +103,7 @@ class ModelVsCopFNR(OutputDir):
         plt.legend(loc='upper right')
 
         # Save the plot to a file
-        plt.savefig(f'{self.output_dir}/model_vs_CoP_FNR.png')
+        fig.set_size_inches(4, 3)
+        plt.tight_layout(w_pad=0)
+        plt.savefig(f'{self.output_dir}/model_vs_CoP_FNR.pdf', format='pdf')
         print(f'Reports saved to {self.output_dir}')
