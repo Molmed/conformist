@@ -9,6 +9,10 @@ class PerformanceReport(OutputDir):
     FIGURE_WIDTH = 12
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers, DejaVu Sans"  # Choose a font that supports embedding
+
+
 
     def __init__(self, base_output_dir):
         self.create_output_dir(base_output_dir)
@@ -48,10 +52,12 @@ class PerformanceReport(OutputDir):
                       items_by_class,
                       output_file_prefix,
                       ylabel,
-                      color):
+                      color,
+                      title=None):
         # Reset plt
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure()
+        plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
 
         # Remove the grid
         plt.grid(False)
@@ -69,18 +75,15 @@ class PerformanceReport(OutputDir):
 
         # Visualize this dict as a bar chart
         # sns.set_style('whitegrid')
-        fig, ax = plt.subplots(figsize=(
-            self.FIGURE_WIDTH,
-            self.FIGURE_HEIGHT))
+        fig, ax = plt.subplots()
+        plt.tight_layout()
         bars = ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
         ax.set_xticks(range(len(mean_sizes)))
         ax.set_xticklabels(mean_sizes.keys(),
                            rotation='vertical')
-        ax.tick_params(axis='both',
-                       labelsize=PerformanceReport.FIGURE_FONTSIZE)
-        ax.set_ylabel(ylabel,
-                      fontsize=PerformanceReport.FIGURE_FONTSIZE)
-        ax.set_xlabel('True class', fontsize=PerformanceReport.FIGURE_FONTSIZE)
+        ax.tick_params(axis='both')
+        ax.set_ylabel(ylabel)
+        ax.set_xlabel('True class')
 
         # Print the number above each bar
         for bar in bars:
@@ -88,12 +91,11 @@ class PerformanceReport(OutputDir):
             ax.text(
                 bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}',
                 ha='center',
-                va='bottom',
-                fontsize=PerformanceReport.FIGURE_FONTSIZE)
+                va='bottom')
 
-
-        plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/{output_file_prefix}.png')
+        fig.set_size_inches(4, 3)
+        plt.tight_layout(w_pad=0)
+        plt.savefig(f'{self.output_dir}/{output_file_prefix}.pdf', format='pdf')
 
     def visualize_mean_set_sizes_by_class(self,
                                           mean_set_sizes_by_class):

@@ -660,7 +660,7 @@ class PredictionDataset(OutputDir):
                             loc='lower center',
                             frameon=False,
                             ncol=4,
-                            bbox_to_anchor=(0.35, -0.2),
+                            bbox_to_anchor=(0.35, -0.3),
                             handletextpad=1,  # Increase padding between legend handle and text
                             columnspacing=2  # Increase spacing between columns
                             )
@@ -680,7 +680,7 @@ class PredictionDataset(OutputDir):
 
         # plt.tight_layout()
 
-        fig.set_size_inches(3.75, 6)
+        fig.set_size_inches(4, 4)
 
         # Save the plot to a file
         # plt.subplots_adjust(hspace=0.5)

@@ -12,6 +12,8 @@
 
 <h1 class="custom-font miami-neon-text">Conformist</h1>
 
+## About
+
 Conformist v1.1.1 is an implementation of conformal prediction, specifically conformal risk control. It was written using Python 3.8.
 
 *BaseCoP* contains utility functions common to all conformal predictors, such as splitting data into calibration and validation sets, and setting up runs. It is extended by *FNRCoP* that implements conformal risk control.
@@ -68,3 +70,8 @@ mcp.calibrate()
 formatted_predictions = mcp.predict(testpd,
                                     OUTPUT_DIR)
 ```
+
+## Publication
+
+Mariya Lysenkova Wiklander et al. Error Reduction in Leukemia Machine Learning Classification With Conformal Prediction. JCO Clin Cancer Inform 9, e2400324(2025).
+DOI:[10.1200/CCI-24-00324](https://doi.org/10.1200/CCI-24-00324)

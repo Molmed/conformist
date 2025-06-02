@@ -103,7 +103,7 @@ class ModelVsCopFNR(OutputDir):
         plt.legend(loc='upper right')
 
         # Save the plot to a file
-        fig.set_size_inches(4, 3)
+        fig.set_size_inches(4, 2)
         plt.tight_layout(w_pad=0)
         plt.savefig(f'{self.output_dir}/model_vs_CoP_FNR.pdf', format='pdf')
         print(f'Reports saved to {self.output_dir}')

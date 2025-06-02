@@ -20,6 +20,11 @@ class BaseCoP(OutputDir):
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
 
+    plt.rcParams["pdf.fonttype"] = 42  # If saving as PDF too
+    plt.rcParams["font.family"] = "Univers, DejaVu Sans"  # Choose a font that supports embedding
+
+
+
     def __init__(self, prediction_dataset: PredictionDataset, alpha=0.1):
         self.prediction_dataset = prediction_dataset
         self.alpha = alpha
@@ -198,8 +203,9 @@ class BaseCoP(OutputDir):
                 for prediction_set in prediction_sets]
 
     def upset_plot(self, predictions_sets, output_dir, color="black"):
-        plt.figure(figsize=(self.FIGURE_WIDTH,
-                            self.FIGURE_HEIGHT))
+        fig = plt.figure(figsize=(8, 3))
+        plt.tight_layout()
+        plt.rcParams.update({'font.size': 6})
 
         class_names = self.class_names
 
@@ -214,8 +220,17 @@ class BaseCoP(OutputDir):
         # Set a multi-index
         upset_data.set_index(upset_data.columns.tolist(), inplace=True)
 
-        plot(upset_data, sort_by="cardinality", facecolor=color, show_counts="%d", show_percentages="{:.0%}")
+        plot(upset_data,
+             fig=fig,
+             element_size=15,
+             sort_by="cardinality",
+             facecolor=color,
+             show_counts="%d",
+             show_percentages="{:.0%}")
 
-        path = f'{output_dir}/upset_plot.png'
+        # fig.set_size_inches(8, 3)
+        plt.tight_layout(w_pad=0)
+
+        path = f'{output_dir}/upset_plot.pdf'
         print("Saving upset plot to", path)
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches='tight', format='pdf')
