@@ -5,7 +5,7 @@ from .output_dir import OutputDir
 
 
 class PerformanceReport(OutputDir):
-    FIGURE_FONTSIZE = 16
+    FIGURE_FONTSIZE = 12
     FIGURE_WIDTH = 12
     FIGURE_HEIGHT = 8
     plt.rcParams.update({'font.size': FIGURE_FONTSIZE})
@@ -55,9 +55,9 @@ class PerformanceReport(OutputDir):
                       color,
                       title=None):
         # Reset plt
-        fig = plt.figure()
+        fig = plt.figure(figsize=(self.FIGURE_WIDTH, self.FIGURE_HEIGHT))
         plt.tight_layout()
-        plt.rcParams.update({'font.size': 6})
+        plt.rcParams.update({'font.size': 10})
 
         # Remove the grid
         plt.grid(False)
@@ -76,11 +76,11 @@ class PerformanceReport(OutputDir):
         # Visualize this dict as a bar chart
         # sns.set_style('whitegrid')
         fig, ax = plt.subplots()
-        plt.tight_layout()
+        # plt.tight_layout()
         bars = ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
         ax.set_xticks(range(len(mean_sizes)))
         ax.set_xticklabels(mean_sizes.keys(),
-                           rotation='vertical')
+                           rotation='vertical', fontsize=10)
         ax.tick_params(axis='both')
         ax.set_ylabel(ylabel)
         ax.set_xlabel('True class')
@@ -88,14 +88,21 @@ class PerformanceReport(OutputDir):
         # Print the number above each bar
         for bar in bars:
             height = bar.get_height()
-            ax.text(
-                bar.get_x() + bar.get_width() / 2.0, height, f'{height:.2f}',
+            ax.annotate(
+                f'{height:.2f}',
+                xy=(bar.get_x() + bar.get_width() / 2.0, height),
+                xytext=(0, 6),
+                textcoords='offset points',
                 ha='center',
-                va='bottom')
+                va='bottom',
+                rotation=90,
+                fontsize=8,
+            )
+        ax.margins(y=0.15)
 
-        fig.set_size_inches(4, 3)
+        # fig.set_size_inches(4, 3)
         plt.tight_layout(w_pad=0)
-        plt.savefig(f'{self.output_dir}/{output_file_prefix}.pdf', format='pdf')
+        plt.savefig(f'{self.output_dir}/{output_file_prefix}.svg', format='svg')
 
     def visualize_mean_set_sizes_by_class(self,
                                           mean_set_sizes_by_class):

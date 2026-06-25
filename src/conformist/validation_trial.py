@@ -166,8 +166,12 @@ class ValidationTrial(OutputDir):
         for run in self.runs:
             fnrs.append(run.false_negative_rate())
 
+        print(fnrs)
+
         # Get overall FNR
         mean_fnrs = round(self.mean_false_negative_rate(), 4)
+
+        print(mean_fnrs)
 
         # Draw a histogram on the current subplot
         sns.histplot(fnrs,
@@ -200,7 +204,7 @@ class ValidationTrial(OutputDir):
         fig.set_size_inches(4, 3)
         plt.tight_layout(w_pad=0)
 
-        plt.savefig(f'{self.output_dir}/empirical_fnr.pdf', format='pdf')
+        plt.savefig(f'{self.output_dir}/empirical_fnr.svg')
 
         # Clear the current figure
         plt.clf()

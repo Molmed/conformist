@@ -13,8 +13,8 @@ from .output_dir import OutputDir
 class PredictionDataset(OutputDir):
     DATASET_NAME_COL = 'dataset'
     ID_COL = 'id'
-    KNOWN_CLASS_COL = 'known_class'
-    PREDICTED_CLASS_COL = 'predicted_class'
+    KNOWN_CLASS_COL = 'true_label'
+    PREDICTED_CLASS_COL = 'predicted_label'
     MELTED_KNOWN_CLASS_COL = 'melted_known_class'
 
     FIGURE_FONTSIZE = 12
@@ -87,7 +87,7 @@ class PredictionDataset(OutputDir):
         self.predictions_str = np.where(pd.isnull(self.predictions_str),
                                         '', self.predictions_str)
 
-        predicted_classes = [classes.split(',') for classes
+        predicted_classes = [classes.split(';') for classes
                              in self.predictions_str]
 
         self.predictions_bool = np.array(
@@ -103,7 +103,7 @@ class PredictionDataset(OutputDir):
             PredictionDataset.KNOWN_CLASS_COL].values
 
         class_names = self.class_names()
-        known_classes = [classes.split(',') for classes
+        known_classes = [classes.split(';') for classes
                          in self.df[self.KNOWN_CLASS_COL].values]
 
         indices_list = [[class_names.index(class_name)
@@ -123,8 +123,8 @@ class PredictionDataset(OutputDir):
 
     # Create a new df creating a new record for every known class
     def melt(self, primary_class_only=False):
-        # Take KNOWN_CLASS_COL and split the values by comma into a new df with a column for each class
-        known_classes_df = self.df[self.KNOWN_CLASS_COL].str.split(',', expand=True)
+        # Take KNOWN_CLASS_COL and split the values by semicolon into a new df with a column for each class
+        known_classes_df = self.df[self.KNOWN_CLASS_COL].str.split(';', expand=True)
 
         # Label each column as known_class_1, known_class_2, etc.
         known_classes_df.columns = [f'{self.KNOWN_CLASS_COL}_{i+1}' for
@@ -741,10 +741,10 @@ class PredictionDataset(OutputDir):
             # Get the known class names of the prediction set members
             def process_kc_row(row):
                 classes = []
-                for col in str(row[self.KNOWN_CLASS_COL]).split(','):
+                for col in str(row[self.KNOWN_CLASS_COL]).split(';'):
                     if col in row:
                         classes.append(str(row[col]))
-                return ','.join(classes)
+                return ';'.join(classes)
 
             df['known_class_softmax_scores'] = df.apply(
                 lambda row: process_kc_row(row), axis=1)
@@ -754,10 +754,10 @@ class PredictionDataset(OutputDir):
             scores = []
             if row['prediction_sets'] is None:
                 return ''
-            for col in str(row['prediction_sets']).split(','):
+            for col in str(row['prediction_sets']).split(';'):
                 if col in row:
                     scores.append(str(row[col]))
-            return ','.join(scores)
+            return ';'.join(scores)
 
         df['prediction_set_softmax_scores'] = df.apply(
             lambda row: process_row(row), axis=1)

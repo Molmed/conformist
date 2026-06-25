@@ -196,7 +196,7 @@ class BaseCoP(OutputDir):
         ps = [class_names[i] for i in range(len(prediction_set)) if
               prediction_set[i]]
 
-        return ','.join(ps)
+        return ';'.join(ps)
 
     def prediction_sets_to_text(self, prediction_sets, display_classes=None):
         return [self.prediction_set_to_text(prediction_set, display_classes)
