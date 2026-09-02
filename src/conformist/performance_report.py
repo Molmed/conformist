@@ -53,6 +53,7 @@ class PerformanceReport(OutputDir):
                       output_file_prefix,
                       ylabel,
                       color,
+                      include_reference_line=False,
                       title=None):
         # Reset plt
         fig = plt.figure(figsize=(self.FIGURE_WIDTH, self.FIGURE_HEIGHT))
@@ -81,6 +82,8 @@ class PerformanceReport(OutputDir):
             range(len(mean_sizes)),
             mean_sizes.values(),
             color=color)
+        if include_reference_line:
+            ax.axvline(1.0, color='lightgray', linestyle=':', zorder=5)
         ax.set_yticks(range(len(mean_sizes)))
         ax.set_yticklabels(mean_sizes.keys(), fontsize=8)
         ax.tick_params(axis='both')
@@ -111,7 +114,8 @@ class PerformanceReport(OutputDir):
         self._class_report(mean_set_sizes_by_class,
                            'mean_set_sizes_by_class',
                            'Mean set size',
-                           palette[1])
+                           palette[1],
+                           include_reference_line=True)
 
     def visualize_mean_fnrs_by_class(self,
                                      mean_fnrs_by_class):
