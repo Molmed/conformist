@@ -57,7 +57,7 @@ class PerformanceReport(OutputDir):
         # Reset plt
         fig = plt.figure(figsize=(self.FIGURE_WIDTH, self.FIGURE_HEIGHT))
         plt.tight_layout()
-        plt.rcParams.update({'font.size': 10})
+        plt.rcParams.update({'font.size': 8})
 
         # Remove the grid
         plt.grid(False)
@@ -77,28 +77,29 @@ class PerformanceReport(OutputDir):
         # sns.set_style('whitegrid')
         fig, ax = plt.subplots()
         # plt.tight_layout()
-        bars = ax.bar(range(len(mean_sizes)), mean_sizes.values(), color=color)
-        ax.set_xticks(range(len(mean_sizes)))
-        ax.set_xticklabels(mean_sizes.keys(),
-                           rotation='vertical', fontsize=10)
+        bars = ax.barh(
+            range(len(mean_sizes)),
+            mean_sizes.values(),
+            color=color)
+        ax.set_yticks(range(len(mean_sizes)))
+        ax.set_yticklabels(mean_sizes.keys(), fontsize=8)
         ax.tick_params(axis='both')
-        ax.set_ylabel(ylabel)
-        ax.set_xlabel('True class')
+        ax.set_xlabel(ylabel)
+        ax.set_ylabel('True class')
 
         # Print the number above each bar
         for bar in bars:
-            height = bar.get_height()
+            width = bar.get_width()
             ax.annotate(
-                f'{height:.2f}',
-                xy=(bar.get_x() + bar.get_width() / 2.0, height),
-                xytext=(0, 6),
+                f'{width:.2f}',
+                xy=(width, bar.get_y() + bar.get_height() / 2.0),
+                xytext=(6, 0),
                 textcoords='offset points',
-                ha='center',
-                va='bottom',
-                rotation=90,
+                ha='left',
+                va='center',
                 fontsize=8,
             )
-        ax.margins(y=0.15)
+        ax.margins(x=0.15)
 
         # fig.set_size_inches(4, 3)
         plt.tight_layout(w_pad=0)
