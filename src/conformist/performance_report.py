@@ -17,6 +17,17 @@ class PerformanceReport(OutputDir):
     def __init__(self, base_output_dir):
         self.create_output_dir(base_output_dir)
 
+    @staticmethod
+    def _class_colors(class_names, class_color_tsv_path, default_color):
+        if class_color_tsv_path is None:
+            return default_color
+
+        colors = pd.read_csv(class_color_tsv_path,
+                             sep='\t',
+                             header=None,
+                             index_col=0).iloc[:, 0].to_dict()
+        return [colors[class_name] for class_name in class_names]
+
     def mean_set_size(prediction_sets):
         return sum(sum(prediction_set) for
                    prediction_set in prediction_sets) / \
@@ -54,6 +65,7 @@ class PerformanceReport(OutputDir):
                       ylabel,
                       color,
                       include_reference_line=False,
+                      class_color_tsv_path=None,
                       title=None):
         # Reset plt
         fig = plt.figure(figsize=(self.FIGURE_WIDTH, self.FIGURE_HEIGHT))
@@ -78,10 +90,13 @@ class PerformanceReport(OutputDir):
         # sns.set_style('whitegrid')
         fig, ax = plt.subplots()
         # plt.tight_layout()
+        bar_colors = self._class_colors(mean_sizes.keys(),
+                                        class_color_tsv_path,
+                                        color)
         bars = ax.barh(
             range(len(mean_sizes)),
             mean_sizes.values(),
-            color=color)
+            color=bar_colors)
         if include_reference_line:
             ax.axvline(1.0, color='lightgray', linestyle=':', zorder=5)
         ax.set_yticks(range(len(mean_sizes)))
@@ -109,35 +124,45 @@ class PerformanceReport(OutputDir):
         plt.savefig(f'{self.output_dir}/{output_file_prefix}.svg', format='svg')
 
     def visualize_mean_set_sizes_by_class(self,
-                                          mean_set_sizes_by_class):
+                                          mean_set_sizes_by_class,
+                                          class_color_tsv_path=None):
         palette = sns.color_palette("deep")
         self._class_report(mean_set_sizes_by_class,
                            'mean_set_sizes_by_class',
                            'Mean set size',
                            palette[1],
-                           include_reference_line=True)
+                           include_reference_line=True,
+                           class_color_tsv_path=class_color_tsv_path)
 
     def visualize_mean_fnrs_by_class(self,
-                                     mean_fnrs_by_class):
+                                     mean_fnrs_by_class,
+                                     class_color_tsv_path=None):
         palette = sns.color_palette("deep")
         self._class_report(mean_fnrs_by_class,
                            'mean_fnrs_by_class',
                            'Mean FNR',
-                           palette[0])
+                           palette[0],
+                           class_color_tsv_path=class_color_tsv_path)
 
     def visualize_mean_model_fnrs_by_class(self,
-                                           mean_fnrs_by_class):
+                                           mean_fnrs_by_class,
+                                           class_color_tsv_path=None):
         palette = sns.color_palette("deep")
         self._class_report(mean_fnrs_by_class,
                            'mean_model_fnrs_by_class',
                            'Mean model FNR',
-                           palette[2])
+                           palette[2],
+                           class_color_tsv_path=class_color_tsv_path)
 
     def report_class_statistics(self,
                                 mean_set_sizes_by_class,
                                 mean_fnrs_by_class,
-                                mean_model_fnrs_by_class=None):
-        self.visualize_mean_fnrs_by_class(mean_fnrs_by_class)
-        self.visualize_mean_set_sizes_by_class(mean_set_sizes_by_class)
+                                mean_model_fnrs_by_class=None,
+                                class_color_tsv_path=None):
+        self.visualize_mean_fnrs_by_class(
+            mean_fnrs_by_class, class_color_tsv_path)
+        self.visualize_mean_set_sizes_by_class(
+            mean_set_sizes_by_class, class_color_tsv_path)
         if mean_model_fnrs_by_class:
-            self.visualize_mean_model_fnrs_by_class(mean_model_fnrs_by_class)
+            self.visualize_mean_model_fnrs_by_class(
+                mean_model_fnrs_by_class, class_color_tsv_path)

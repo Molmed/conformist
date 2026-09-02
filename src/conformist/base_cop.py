@@ -125,7 +125,8 @@ class BaseCoP(OutputDir):
                 pds,
                 output_dir=None,
                 validate=False,
-                upset_plot_color="black"):
+                upset_plot_color="black",
+                class_color_tsv_path=None):
 
         self.smx = pds.smx
         self.val_smx = pds.smx
@@ -165,7 +166,7 @@ class BaseCoP(OutputDir):
                     self.val_model_predictions,
                     self.softmax_threshold,
                     self.class_names)
-            vr.run_reports(self.output_dir)
+            vr.run_reports(self.output_dir, class_color_tsv_path)
         else:
             stats = {
                 'pct_empty_sets': PerformanceReport.pct_empty_sets(

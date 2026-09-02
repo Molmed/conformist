@@ -162,7 +162,7 @@ class ValidationRun(OutputDir):
                     counts[class_name] = class_counts
         return counts
 
-    def run_reports(self, base_output_dir):
+    def run_reports(self, base_output_dir, class_color_tsv_path=None):
         mean_set_sizes = self.mean_set_sizes_by_class(self.class_names)
         mean_fnrs = self.mean_fnrs_by_class(self.prediction_sets, self.class_names)
         mean_model_fnrs = self.mean_fnrs_by_class(self.model_predictions, self.class_names)
@@ -170,7 +170,8 @@ class ValidationRun(OutputDir):
         pr = PerformanceReport(base_output_dir)
         pr.report_class_statistics(mean_set_sizes,
                                    mean_fnrs,
-                                   mean_model_fnrs)
+                                   mean_model_fnrs,
+                                   class_color_tsv_path)
 
         np.seterr(all='raise')
         self.create_output_dir(base_output_dir)

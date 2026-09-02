@@ -146,10 +146,10 @@ class ValidationTrial(OutputDir):
         means = dict(sorted(means.items(), key=lambda item: item[1], reverse=True))
         return means
 
-    def run_reports(self, base_output_dir):
+    def run_reports(self, base_output_dir, class_color_tsv_path=None):
         self.create_output_dir(base_output_dir)
         self.visualize_empirical_fnr()
-        self.visualize_class_performance()
+        self.visualize_class_performance(class_color_tsv_path)
         print(f'Reports saved to {self.output_dir}')
 
     def visualize_empirical_fnr(self):
@@ -205,8 +205,11 @@ class ValidationTrial(OutputDir):
         # Clear the current figure
         plt.clf()
 
-    def visualize_class_performance(self):
+    def visualize_class_performance(self, class_color_tsv_path=None):
         fnrs_by_class = self.mean_fnrs_by_class(self.class_names)
         mean_set_sizes = self.mean_set_sizes_by_class(self.class_names)
         pr = PerformanceReport(self.output_dir)
-        pr.report_class_statistics(mean_set_sizes, fnrs_by_class)
+        pr.report_class_statistics(
+            mean_set_sizes,
+            fnrs_by_class,
+            class_color_tsv_path=class_color_tsv_path)
