@@ -166,12 +166,8 @@ class ValidationTrial(OutputDir):
         for run in self.runs:
             fnrs.append(run.false_negative_rate())
 
-        print(fnrs)
-
         # Get overall FNR
         mean_fnrs = round(self.mean_false_negative_rate(), 4)
-
-        print(mean_fnrs)
 
         # Draw a histogram on the current subplot
         sns.histplot(fnrs,
